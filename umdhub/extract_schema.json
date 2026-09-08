@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "feed_ref": {"type": "integer"},
+          "course": {"type": "string", "enum": ["UNKNOWN"]},
+          "kind": {"type": "string", "enum": ["assignment", "quiz", "exam", "project", "event", "admin"]},
+          "title": {"type": "string"},
+          "due_local": {"type": ["string", "null"]},
+          "due_known_time": {"type": "boolean"},
+          "confidence": {"type": "number"},
+          "quote": {"type": "string"},
+          "replaces_title": {"type": ["string", "null"]},
+          "action": {"type": "string", "enum": ["new", "move", "cancel"]}
+        },
+        "required": ["feed_ref", "course", "kind", "title", "due_local", "due_known_time", "confidence", "quote", "action"]
+      }
+    }
+  },
+  "required": ["candidates"]
+}

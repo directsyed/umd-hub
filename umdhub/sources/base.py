@@ -94,6 +94,25 @@ def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:80]
 
 
+_KIND_RES = [
+    ("exam", re.compile(r"\b(final|midterm|mid-term|exam)\b", re.I)),
+    ("quiz", re.compile(r"\bquiz(zes)?\b", re.I)),
+    ("project", re.compile(r"\bproj(ect)?s?\b", re.I)),
+    ("assignment", re.compile(
+        r"\b(homework|hw|assignment|problem\s*set|pset|lab|matlab|discussion|essay|draft|paper|proposal|"
+        r"reflection|worksheet|exercise)\b", re.I)),
+]
+
+
+def classify_kind(title: str, default: str = "assignment") -> str:
+    """Kind from a title. Order matters: 'Final Project' is a project, 'Quiz 3 (exam review)' an exam? No —
+    exam words win so that 'Midterm' never files as an assignment; projects beat generic words."""
+    for kind, rx in _KIND_RES:
+        if rx.search(title or ""):
+            return kind
+    return default
+
+
 def guess_course(text: str, courses: dict) -> str | None:
     """Best-effort course from free text using each course's subject_tokens + canvas_names."""
     if not text:

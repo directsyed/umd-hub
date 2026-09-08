@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CMSC 330</title>
+
+    
+    <link href="{& static 'css/output.css' %}" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">   
+    <link href="/static/courses/style.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/cmsc330">CMSC330</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link"  href="/cmsc330">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cmsc330/announcements">Announcements</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Staff
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/cmsc330/staff">Staff Page</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://forms.gle/wV2Pigm8dBpq5LkZ8" target="_blank">Report</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/cmsc330/careers">Careers</a></li>
+          </ul>
+        </li>
+        <!---
+        <li class="nav-item">
+          <a class="nav-link" href="#">Office Hours</a>
+        </li>
+        --->
+        <li class="nav-item">
+          <a class="nav-link" href="/cmsc330/slides">Slides</a>
+        </li>
+        <!---
+        <li class="nav-item">
+          <a class="nav-link" href="#">Projects</a>
+        </li>
+        --->
+        <li class="nav-item">
+          <a class="nav-link" href="/cmsc330/syllabus">Syllabus</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cmsc330/resources">Resources</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cmsc330/careers">Careers</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        
+        <li class="nav-item"><a class="nav-link" href="https://gitlab.cs.umd.edu/cmsc330/fall26/" target="_blank">Gitlab</a></li>
+        
+        
+        <li class="nav-item"><a class="nav-link" href="https://piazza.com/umd/fall2026/cmsc330cliff" target="_blank">Piazza</a></li>
+        
+        
+        <li class="nav-item"><a class="nav-link" href="https://www.gradescope.com/courses/1374332" target="_blank">Gradescope</a></li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card rounded-top">
+        <div class="card-header bg-header rounded-top">
+          <h1 class='text-white'>CMSC 330</h1>
+        </div>
+        <div class="card-body bg-body rounded-top">
+          <h2>Organization of Programming Languages<br>
+              Fall 2026</h2>
+        </div>
+        <div class="card-header bg-header">
+          <h3 class='text-white'>Instructors</h3>
+        </div>
+        <table class="table">
+          <tbody>
+          <tr>
+          <th width="22%">Name</th>
+          <th width="12%">Section</th>
+          <th width="11%">Office</th>
+          <th width="16%">E-mail</th>
+          <th width="39%">Office Hours<br>
+          (also available by appointment)</th>
+          </tr>
+          
+          <tr>
+          <td>Cliff</td>
+          <td>
+          
+          0101
+          
+          </td>
+          <td>IRB2238</td>
+          <td><a href="mailto:cyb@umd.edu">Email</a></td>
+          <td>TuTh1:00-2:00</td>
+          </tr>
+          
+          </tbody>
+        </table>
+
+        <div class="card-header bg-header rounded-top">
+          <h3 class='text-white'>TAs</h3>
+        </div>
+        <table class="table">
+          <tbody>
+          <tr>
+          <th width="50%">Name</th>
+          <th width="50%">Contact</th>
+          </tr>
+          
+          <tr>
+          <td>Annie Zhou</td>
+          <td><a href="mailto:azhou05@umd.edu">azhou05@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Maya Popova</td>
+          <td><a href="mailto:mpopova@umd.edu">mpopova@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Winnie Chen</td>
+          <td><a href="mailto:wchen139@umd.edu">wchen139@umd.edu</a></td>
+          </tr>
+          
+          
+          <tr>
+          <td>Amadeo De La Vega</td>
+          <td><a href="mailto:adelaveg@umd.edu">adelaveg@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Hita Thota</td>
+          <td><a href="mailto:hthota27@umd.edu">hthota27@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Jeffrey Yang</td>
+          <td><a href="mailto:jyang148@umd.edu">jyang148@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>June Cagan</td>
+          <td><a href="mailto:jcagan@umd.edu">jcagan@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Khalid Saifullah</td>
+          <td><a href="mailto:khalids@umd.edu">khalids@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Nishit Anand</td>
+          <td><a href="mailto:nishit@umd.edu">nishit@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Nolawe Temketem</td>
+          <td><a href="mailto:ntemkete@umd.edu">ntemkete@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Pavan Mantripragada</td>
+          <td><a href="mailto:mppavan@umd.edu">mppavan@umd.edu</a></td>
+          </tr>
+          
+          <tr>
+          <td>Samuel Lam</td>
+          <td><a href="mailto:slam1@umd.edu">slam1@umd.edu</a></td>
+          </tr>
+          
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card rounded-top">
+        <div class="card-header bg-header">
+          <h3 class='text-white'>Announcements</h3>
+        </div>
+      </div>
+  
+    <div class="card" style="width: 18rem;">
+      <div class="card-header">
+       Announcements will be found here 
+      </div>
+    </div>
+  
+
+        <div class="card-header bg-header rounded-top">
+          <h3 class='text-white'>Information</h3>
+        </div>
+        <table class="table">
+          <tbody>
+          <tr>
+            <th>Course</th>
+            <td>CMSC 330<br>Organization of Programming Languages</td>
+          </tr>
+          <tr>
+            <th>Lectures</th>
+            <td>
+            020X: TuTh 2:00pm - 3:15pm KEY0106<br>
+            
+            030X: TuTh 3:30pm - 4:45pm KEY0106<br>
+            </td>
+          </tr>
+          <tr>
+            <th>Semester</th>
+            <td>Fall 2026</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="card-header bg-header rounded-top">
+          <h3 class='text-white'>Important Dates</h3>
+        </div>
+        <table class="table">
+          <tbody>
+          
+          <tr>
+            <th>Quizzes</th>
+            <th>Date</th>
+          </tr>
+          
+          <tr>
+          <td>Quiz 1</td>
+          <td>September 11th</td>
+          </tr>
+          
+          <tr>
+          <td>Quiz 2</td>
+          <td>September25th</td>
+          </tr>
+          
+          <tr>
+          <td>Quiz 3</td>
+          <td>October 23rd</td>
+          </tr>
+          
+          <tr>
+          <td>Quiz 4</td>
+          <td>November 6th</td>
+          </tr>
+          
+          <tr>
+          <td>Quiz 5</td>
+          <td>December 4th</td>
+          </tr>
+          
+          <tr>
+          <td>Exam 1</td>
+          <td>October 6th</td>
+          </tr>
+          
+          <tr>
+          <td>Exam 1 Coding</td>
+          <td>October 8th</td>
+          </tr>
+          
+          <tr>
+          <td>Exam 2</td>
+          <td>November 17th</td>
+          </tr>
+          
+          <tr>
+          <td>Exam 2 Coding</td>
+          <td>November 19th</td>
+          </tr>
+          
+          
+
+          
+          <tr>
+            <th>Exams </th>
+            <th>Date</th>
+          </tr>
+          
+          <tr>
+          <td>Final Exam</td>
+          <td>December 15th 6:30pm - 8:30pm</td>
+          </tr>
+          
+          
+
+          
+          <tr>
+            <th>Projects</th>
+            <th>Tentative Release Date</th>
+          </tr>
+          
+          <tr>
+          <td>Project 1</td>
+          <td>September 15th</td>
+          </tr>
+          
+          <tr>
+          <td>Project 2</td>
+          <td>September 28th</td>
+          </tr>
+          
+          <tr>
+          <td>Project 3</td>
+          <td>October 20th</td>
+          </tr>
+          
+          <tr>
+          <td>Project 4</td>
+          <td>November 10th</td>
+          </tr>
+          
+          
+          </tbody>
+        </table>
+        <div class="card-header bg-header rounded-top">
+          <h3 class='text-white'>Discussions</h3>
+        </div>
+        <table class="table">
+          <tbody>
+            
+            <tr>
+              <td>0201</td>
+              <td> </td>
+              <td>9:00am - 9:50am</td>
+              <td>CSI1121</td>
+            </tr>
+            
+            <tr>
+              <td>0202</td>
+              <td> </td>
+              <td>10:00am - 10:50am</td>
+              <td>CSI1121</td>
+            </tr>
+            
+            <tr>
+              <td>0203</td>
+              <td> </td>
+              <td>11:00am - 11:50am</td>
+              <td>CSI1122</td>
+            </tr>
+            
+            <tr>
+              <td>0204</td>
+              <td> </td>
+              <td>12:00pm - 12:50pm</td>
+              <td>CSI1122</td>
+            </tr>
+            
+            <tr>
+              <td>0205</td>
+              <td> </td>
+              <td>1:00pm - 1:50pm</td>
+              <td>CSI1121</td>
+            </tr>
+            
+            <tr>
+              <td>0301</td>
+              <td> </td>
+              <td>11:00am - 11:50am</td>
+              <td>CSI3118</td>
+            </tr>
+            
+            <tr>
+              <td>0302</td>
+              <td> </td>
+              <td>12:00pm - 12:50pm</td>
+              <td>CSI1121</td>
+            </tr>
+            
+            <tr>
+              <td>0303</td>
+              <td> </td>
+              <td>12:00pm - 12:50pm</td>
+              <td>CSI3118</td>
+            </tr>
+            
+            <tr>
+              <td>0304</td>
+              <td> </td>
+              <td>1:00pm - 1:50pm</td>
+              <td>IRB1207</td>
+            </tr>
+            
+            <tr>
+              <td>0305</td>
+              <td> </td>
+              <td>2:00pm - 2:50pm</td>
+              <td>CSI3118</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+<div class="container">
+  <div class="row">
+    <div class="card-header bg-header rounded-top">
+    <h3 class='text-white'>Office Hours</h3>
+    </div>
+    <p>TA Office hours are held in IRB2136. Those holding virtual Office hours are marked with a (V). Their zoom links are also in the event information window.</p>
+  </div>
+</div>
+
+<div class="container" style="width:100%;text-align:center">
+<iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FNew_York&showTitle=0&mode=WEEK&showTabs=0&showPrint=0&showDate=0&showCalendars=0&src=Y185NzVmNzkxM2U4M2U5OGViNzNjYWM4OGM1ZDkwNWFlZjQxNTBiODVmODczZTliN2Y2MTdmNjU0NDI4ZTg4NmExQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&color=%238e24aa" style="border-width:0" width="100%" height="1350" frameborder="0" scrolling="no"></iframe>
+</div>
+
+
+  <footer>
+  <p><a href="https://www.umd.edu/web-accessibility" title="UMD Web Accessibility">Web Accessibility</a></p>
+  </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>

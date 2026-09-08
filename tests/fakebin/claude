@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Fake `claude` CLI for tests. Behaviour via FAKE_CLAUDE_MODE:
+#   ok (default) → cat $FAKE_CLAUDE_OUTPUT (a result envelope with structured_output)
+#   fail         → exit 1 with stderr
+#   garbage      → non-JSON on stdout
+#   text         → envelope whose result is prose wrapping JSON, no structured_output
+#   empty        → envelope with an empty candidates list
+cat >/dev/null  # consume the prompt on stdin
+case "${FAKE_CLAUDE_MODE:-ok}" in
+  fail)    echo "boom: not logged in" >&2; exit 1 ;;
+  garbage) echo "this is not json"; exit 0 ;;
+  text)    printf '%s' '{"type":"result","subtype":"success","result":"Sure! {\"candidates\": []}"}'; exit 0 ;;
+  empty)   printf '%s' '{"type":"result","subtype":"success","structured_output":{"candidates":[]}}'; exit 0 ;;
+  *)       cat "${FAKE_CLAUDE_OUTPUT:?set FAKE_CLAUDE_OUTPUT}" ;;
+esac

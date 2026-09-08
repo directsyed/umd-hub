@@ -1,0 +1,50 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 1234,
+  "num_turns": 1,
+  "result": "{\"candidates\": [...]}",
+  "session_id": "fake",
+  "total_cost_usd": 0.001,
+  "structured_output": {
+    "candidates": [
+      {
+        "feed_ref": 1,
+        "course": "BCHM461",
+        "kind": "assignment",
+        "title": "Homework 1",
+        "due_local": "2026-09-18T23:59",
+        "due_known_time": true,
+        "confidence": 0.95,
+        "quote": "It is due Friday, September 18 at 11:59 pm via the online link.",
+        "replaces_title": null,
+        "action": "new"
+      },
+      {
+        "feed_ref": 1,
+        "course": "BCHM461",
+        "kind": "exam",
+        "title": "Mid-term Exam I",
+        "due_local": "2026-09-29",
+        "due_known_time": false,
+        "confidence": 0.9,
+        "quote": "Remember the first midterm is September 29.",
+        "replaces_title": null,
+        "action": "new"
+      },
+      {
+        "feed_ref": 7,
+        "course": "CMSC330",
+        "kind": "quiz",
+        "title": "Orphan ref",
+        "due_local": "2026-09-30",
+        "due_known_time": false,
+        "confidence": 0.5,
+        "quote": "n/a",
+        "replaces_title": null,
+        "action": "new"
+      }
+    ]
+  }
+}

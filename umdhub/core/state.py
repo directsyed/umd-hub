@@ -251,6 +251,15 @@ class State:
             "((all_day=0 AND due_at < ?) OR (all_day=1 AND due_date_local < ?)) "
             "ORDER BY due_at", (now_iso, today_local)))
 
+    def due_between(self, start_iso: str, end_iso: str) -> list[sqlite3.Row]:
+        """Open items with a timed/all-day deadline in [start, end] (UTC ISO)."""
+        return list(self.conn.execute(
+            "SELECT * FROM item WHERE status='open' AND due_at >= ? AND due_at <= ? ORDER BY due_at",
+            (start_iso, end_iso)))
+
+    def match_pool(self, course: str) -> list[dict]:
+        return self._match_pool(course)
+
     def undated(self, course: str | None = None, statuses: tuple[str, ...] = ("open",)) -> list[sqlite3.Row]:
         q = f"SELECT * FROM item WHERE due_at IS NULL AND status IN ({','.join('?' * len(statuses))})"
         args: list[Any] = [*statuses]
