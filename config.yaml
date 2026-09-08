@@ -46,7 +46,7 @@ courses:
     name: "Introduction to Algorithms"
     color: "#34d399"
     canvas_names: ["CMSC351", "CMSC 351"]
-    email_senders: ["wwongkam@umd.edu", "ramans@umd.edu", "kruskal@umd.edu"]
+    email_senders: ["wwongkam@umd.edu", "ramans@umd.edu"]
     subject_tokens: ["CMSC351", "CMSC 351", "351"]
     gradescope_short: ["CMSC351", "CMSC 351"]
     piazza_names: ["CMSC351", "CMSC 351"]

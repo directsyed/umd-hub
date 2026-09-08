@@ -26,18 +26,79 @@ sudo ufw allow from 10.10.0.0/24 to any port 8765 proto tcp comment umdhub-wg
 
 Then open `http://10.0.0.200:8765/login?key=<HUB_SHARED_SECRET>` once per device (cookie lasts 90 days).
 
-## 2. Credentials (only you can do these)
+## 2. First login (step 3)
 
-| Source | What | Where it goes |
-|---|---|---|
-| Canvas/ELMS | ELMS → Calendar → **Calendar Feed** (bottom right) → copy the `.ics` URL. Also Account → Notifications → email **ASAP** for Announcements, Due Date, Grading, Course Content. | `/credentials` page |
-| Gradescope | Log in (SSO), DevTools → Application → Cookies → `www.gradescope.com` → copy `signed_token` and `_gradescope_session` as `name=value; name=value`. | `/credentials` page |
-| Piazza | `PIAZZA_EMAIL` / `PIAZZA_PASSWORD` (its own account, not UMD's) | `secrets.env` |
-| Email | terpmail: Google Account → Security → 2-Step Verification → App passwords. If unavailable, make a Gmail filter forwarding course mail to personal Gmail and use an App Password there. Then `python -m umdhub.probe email`. | `secrets.env` (`EMAIL_USER`, `EMAIL_APP_PASSWORD`) |
-| Discord | Server Settings → Integrations → Webhooks → New | `secrets.env` (`DISCORD_WEBHOOK_URL`) |
-| LAN login | `python3 -c 'import secrets; print(secrets.token_urlsafe(32))'` | `secrets.env` (`HUB_SHARED_SECRET`) |
+`secrets.env` already holds a generated `HUB_SHARED_SECRET`. Print it, then open the login URL once
+on each device; the cookie lasts 90 days.
 
-After editing `secrets.env`: `systemctl --user restart umdhub-app.service`.
+```bash
+grep HUB_SHARED_SECRET "/home/syed/Shared/Computing Projects/UMD Hub/secrets.env"
+```
+
+- **Desktop / laptop on home Wi-Fi, or laptop over WireGuard:** `http://10.0.0.200:8765/login?key=PASTE-THE-SECRET`
+- **Phone on home Wi-Fi:** same URL (it's in `10.0.0.0/24`). Off-network phone access arrives with Phase B.
+- If you get **"forbidden"**: your device isn't in an allowed CIDR (check `web.allowed_cidrs` in `config.yaml`,
+  or the ufw rule). If you get the login form with **"wrong key"**: the secret was mistyped/URL-encoded — paste it
+  into the form instead.
+
+## 3. Credentials (step 4 — pasted on the Hub's `/credentials` page)
+
+Nothing here is a password. Both values are revocable by logging out / regenerating.
+
+**Canvas calendar feed** (structured due dates for every ELMS course, no token needed)
+1. Log in to `https://umd.instructure.com` → left rail **Calendar**.
+2. Bottom-right of the calendar page: **"Calendar Feed"** link → a dialog shows a URL starting
+   `https://umd.instructure.com/feeds/calendars/user_…ics` → **Copy**.
+3. Hub → **Keys** → *Canvas calendar feed URL* → paste → **save** → **test** (should report the event count per course).
+4. While in ELMS: **Account → Notifications**. Set these to *Notify immediately* (the envelope icon) so they arrive by
+   email and the Hub's email source picks them up: *Due Date*, *Grading Policies*, *Course Content*, *Announcement*,
+   *Grading*, *Discussion*. (Canvas announcements/grade changes are not in the .ics feed.)
+
+**Gradescope cookies** (assignments, due dates, submission status, scores)
+1. Log in at `https://www.gradescope.com` with School Credentials as usual, land on your dashboard.
+2. Open DevTools: **F12** (or right-click → Inspect).
+   - **Chrome / Edge / Brave:** *Application* tab → left tree **Storage → Cookies → https://www.gradescope.com**.
+   - **Firefox:** *Storage* tab → **Cookies → https://www.gradescope.com**.
+3. Find the rows named **`signed_token`** and **`_gradescope_session`**. Double-click each *Value* cell, copy.
+4. Hub → **Keys** → *Gradescope cookies* → paste as one line:
+   `signed_token=PASTE1; _gradescope_session=PASTE2` → **save** → **test** (should list your Fall 2026 courses and
+   which Hub course each maps to). CMSC351 will be missing until the roster issue is fixed — expected.
+5. When the pill turns red weeks from now, repeat steps 1–4. Logging out of Gradescope in that browser invalidates
+   the cookie, so use a browser you stay logged into.
+
+## 4. secrets.env (step 5)
+
+```bash
+nano "/home/syed/Shared/Computing Projects/UMD Hub/secrets.env"
+```
+
+| Key | How to get it |
+|---|---|
+| `PIAZZA_EMAIL` / `PIAZZA_PASSWORD` | Your Piazza account's own email + password (not UMD's). If Piazza login throttles you, leave these blank and paste the `session_id` cookie from piazza.com on the Keys page instead. |
+| `EMAIL_USER` / `EMAIL_APP_PASSWORD` | **Try terpmail first:** `myaccount.google.com` while signed in as `…@terpmail.umd.edu` → **Security** → *2-Step Verification* must be **On** (turn it on if not) → then `myaccount.google.com/apppasswords` → name it `umd-hub` → **Create** → copy the 16-character password (spaces don't matter). `EMAIL_USER` is the full address. **If the App passwords page says it isn't available for your account**, UMD's admin blocked it: instead, in terpmail Gmail → Settings → *Filters and Blocked Addresses* → create a filter `from:(umd.edu OR instructure.com OR gradescope.com OR piazza.com)` → *Forward it to* your personal Gmail, then make the App Password on the personal Gmail and use that address here. |
+| `EMAIL_IMAP_HOST` | leave `imap.gmail.com` |
+| `DISCORD_WEBHOOK_URL` | Discord → your server → **Server Settings → Integrations → Webhooks → New Webhook** → pick a channel (make a `#umd-hub` one) → **Copy Webhook URL**. |
+| `HUB_SHARED_SECRET` | already set |
+| `CF_ACCESS_*` | leave blank until Phase B |
+
+Save, then restart and probe each source — every probe prints exactly what's wrong if something is:
+
+```bash
+cd "/home/syed/Shared/Computing Projects/UMD Hub"
+systemctl --user restart umdhub-app.service
+.venv/bin/python -m umdhub.probe all
+```
+
+## 5. First real refresh (step 6)
+
+```bash
+.venv/bin/python -m umdhub.refresh --trigger manual
+```
+
+Then open **Status** on the Hub: every enabled source should show `ok`. Expect the Discord digest within a few
+seconds (first one lists everything due in 24 h plus any credential/source problems). Open **Feed** to see the
+emails/Piazza posts that came in, and **Tray** for any deadlines the extractor pulled from them — confirm or reject
+each; nothing reaches the calendar without you.
 
 ## 3. Checks
 
