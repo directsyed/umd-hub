@@ -1,0 +1,23 @@
+# UMD Hub collector — single pass, fired by umdhub-refresh.timer and by the
+# app's "refresh now" button (systemctl --user start umdhub-refresh.service).
+# Oneshot: a scraper or `claude -p` blow-up dies with this unit, never with the app.
+[Unit]
+Description=UMD Hub refresh (collect sources, extract, notify)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/syed/Shared/Computing Projects/UMD Hub
+EnvironmentFile=-/home/syed/Shared/Computing Projects/UMD Hub/secrets.env
+ExecStart=/home/syed/Shared/Computing\x20Projects/UMD\x20Hub/.venv/bin/python -m umdhub.refresh --trigger timer
+TimeoutStartSec=15min
+MemoryHigh=768M
+MemoryMax=1G
+TasksMax=128
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+# NOTE: no [Install] section — this service is started by the .timer or the app,
+# not enabled directly. Enable umdhub-refresh.timer instead.

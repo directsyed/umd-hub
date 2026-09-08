@@ -1,0 +1,29 @@
+{% macro item_row(it, show_course=True, show_date=False) -%}
+<li class="item kind-{{ it.kind }} status-{{ it.status }}" data-id="{{ it.id }}">
+  <div class="row">
+    <span class="icon" title="{{ it.kind }}">{{ KIND_ICON.get(it.kind, '•') }}</span>
+    {% if show_course %}<a class="pill sm" style="--c: {{ courses[it.course].color }}" href="/course/{{ it.course }}">{{ it.course }}</a>{% endif %}
+    <span class="title">{% if it.url %}<a href="{{ it.url }}" target="_blank" rel="noopener">{{ it.title }}</a>{% else %}{{ it.title }}{% endif %}</span>
+    <span class="when">{% if it.due_at %}{% if show_date %}{{ it.due_at|et(it.all_day) }}{% else %}{{ it.due_at|et_time(it.all_day) }}{% endif %}{% else %}—{% endif %}</span>
+  </div>
+  {% if it.weight_note or it.notes or it.submission_status or it.score %}
+  <div class="meta">
+    {% if it.weight_note %}<span class="weight">{{ it.weight_note }}</span>{% endif %}
+    {% if it.submission_status %}<span class="sub">{{ it.submission_status }}</span>{% endif %}
+    {% if it.score %}<span class="score">{{ it.score }}</span>{% endif %}
+    {% if it.notes %}<details class="notes"><summary>notes</summary><div>{{ it.notes }}</div></details>{% endif %}
+  </div>
+  {% endif %}
+  <div class="actions">
+    {% if it.status in ('open', 'snoozed') %}
+      <button data-act="done">✓ done</button>
+      <button data-act="snooze" data-until="tomorrow">zz→tmrw</button>
+      <button data-act="snooze" data-until="3d">zz→3d</button>
+      <button data-act="cancel" class="quiet">✕</button>
+    {% else %}
+      <button data-act="reopen" class="quiet">reopen</button>
+    {% endif %}
+    <span class="src">{{ it.primary_source }}</span>
+  </div>
+</li>
+{%- endmacro %}

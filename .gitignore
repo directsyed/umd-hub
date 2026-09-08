@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Secrets and live state — never commit
+secrets.env
+state.sqlite
+state.sqlite-wal
+state.sqlite-shm
+state/
+*.log
+
+.vscode/
+.idea/
+*.swp
+.DS_Store

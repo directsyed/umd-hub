@@ -1,0 +1,39 @@
+{% extends "base.html.j2" %}
+{% block title %}Tray · UMD Hub{% endblock %}
+{% block content %}
+<h1>Candidates tray</h1>
+<p class="dim">Deadlines the extractor found in emails / Piazza / announcements. Nothing lands on the calendar until you confirm it here. Edit any field before confirming.</p>
+{% if not rows %}<p class="empty">tray is empty.</p>{% endif %}
+<ul class="cands">
+  {% for c in rows %}
+  <li class="cand action-{{ c.action }}">
+    <form method="post" action="/candidate/{{ c.id }}/confirm">
+      <div class="row">
+        <span class="tag {{ c.action }}">{{ c.action }}</span>
+        <span class="conf" title="confidence">{{ '%.0f'|format(c.confidence * 100) }}%</span>
+        <span class="src">{{ c.feed_source }}{% if c.feed_posted_at %} · {{ c.feed_posted_at|et }}{% endif %}</span>
+      </div>
+      <blockquote>{{ c.quote or c.feed_subject }}</blockquote>
+      {% if c.matched_item_id %}<div class="meta">matches existing: <b>{{ c.matched_title }}</b> ({{ c.matched_due_at|et(c.matched_all_day) }})</div>{% endif %}
+      <div class="fields">
+        <select name="course">{% for code in courses %}<option {% if code == c.course %}selected{% endif %}>{{ code }}</option>{% endfor %}</select>
+        <select name="kind">{% for k in KINDS %}<option {% if k == c.kind %}selected{% endif %}>{{ k }}</option>{% endfor %}</select>
+        <input name="title" value="{{ c.title }}" required>
+        <input name="due_date" type="date" value="{{ c.due_date_local or '' }}">
+        <input name="due_time" type="time" value="{% if c.due_at and not c.all_day %}{{ c.due_at|et_time }}{% endif %}" placeholder="time (optional)">
+      </div>
+      <div class="actions">
+        <button class="primary">confirm</button>
+        <button formaction="/candidate/{{ c.id }}/reject" formmethod="post" class="quiet">reject</button>
+        {% if c.feed_url %}<a class="btn quiet" href="{{ c.feed_url }}" target="_blank" rel="noopener">source ↗</a>{% endif %}
+      </div>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% if recent %}
+<section><details><summary><h2>Recently confirmed</h2></summary>
+<ul class="plain">{% for c in recent %}<li>{{ c.course }} · {{ c.title }} · {{ c.due_at|et(c.all_day) }}</li>{% endfor %}</ul>
+</details></section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,106 @@
+# Fall 2026 syllabus foundation layer. Built 2026-09-08 from
+#   University of Maryland/Fall 2026/Scheduling Data/fall-2026-calendar.md
+# and the five class files. This is the source of truth for syllabus dates from here on;
+# live sources (Canvas, Gradescope, …) overlay it. Times are America/New_York.
+# Unknown clock times are left null (all-day). kind ∈ assignment quiz exam project event admin expected
+
+items:
+  # ───────────────────────────── BCHM461 — Biochemistry I (Liu, sec 0101)
+  - {course: BCHM461, kind: admin, title: "Last day to report exam conflicts to Dr. Liu", date: 2026-09-14,
+     weight: "administrative — unrecoverable after", notes: "End of schedule adjustment. Email yxliu@umd.edu with BCHM461 in the subject."}
+  - {course: BCHM461, kind: exam, title: "Mid-term Exam I", date: 2026-09-29, time: "09:30",
+     weight: "20%", notes: "In class. Modules I + II — Lehninger Ch. 1, 2, 3. ~50% recall / ~50% apply-and-extend."}
+  - {course: BCHM461, kind: exam, title: "Mid-term Exam II", date: 2026-11-03, time: "09:30",
+     weight: "20%", notes: "In class. Module III (Ch. 4) + responsible for all prior material."}
+  - {course: BCHM461, kind: exam, title: "Final Exam", date: 2026-12-15, time: "10:30",
+     weight: "40%", notes: "10:30 am–12:30 pm. Cumulative, all five modules, closed book. Same day as the CMSC330 final (6:30 pm)."}
+  - {course: BCHM461, kind: expected, title: "Online homework (5–6, distributed by email)",
+     weight: "20% total", notes: "Arrives by EMAIL, not ELMS. Each one doubles as exam practice — archive it."}
+
+  # ───────────────────────────── CMSC330 — Programming Languages (Bakalian)
+  - {course: CMSC330, kind: quiz, title: "Quiz 1", date: 2026-09-11,
+     weight: "2%", notes: "First 10 minutes of discussion. Closed notes, no internet, no AI. Scope: lecture + discussion code + exercises."}
+  - {course: CMSC330, kind: event, title: "Project 1 released (tentative)", date: 2026-09-15,
+     weight: "6% — due date comes from the spec", notes: "GFA gate: < 20% on any project fails the course."}
+  - {course: CMSC330, kind: quiz, title: "Quiz 2", date: 2026-09-25, weight: "2%", notes: "In discussion, first 10 min."}
+  - {course: CMSC330, kind: event, title: "Project 2 released (tentative)", date: 2026-09-28, weight: "12% — due date from spec"}
+  - {course: CMSC330, kind: exam, title: "Exam 1 — theory day", date: 2026-10-06,
+     weight: "10%", notes: "Full 75-min lecture. Short answer / MC / fill-in. SAME DAY as MATH246 Exam 1."}
+  - {course: CMSC330, kind: exam, title: "Exam 1 — coding day", date: 2026-10-08,
+     weight: "5%", notes: "First 30 min of lecture. Hand-written code, closed everything."}
+  - {course: CMSC330, kind: event, title: "Project 3 released (tentative)", date: 2026-10-20, weight: "12% — due date from spec"}
+  - {course: CMSC330, kind: quiz, title: "Quiz 3", date: 2026-10-23, weight: "2%", notes: "In discussion, first 10 min."}
+  - {course: CMSC330, kind: quiz, title: "Quiz 4", date: 2026-11-06, weight: "2%", notes: "In discussion, first 10 min."}
+  - {course: CMSC330, kind: event, title: "Project 4 released (tentative)", date: 2026-11-10, weight: "6% — due date from spec"}
+  - {course: CMSC330, kind: exam, title: "Exam 2 — theory day", date: 2026-11-17,
+     weight: "10%", notes: "Professor may revert to a 1-day format — re-verify before the cycle."}
+  - {course: CMSC330, kind: exam, title: "Exam 2 — coding day", date: 2026-11-19, weight: "5%"}
+  - {course: CMSC330, kind: quiz, title: "Quiz 5", date: 2026-12-04, weight: "2%", notes: "In discussion, first 10 min."}
+  - {course: CMSC330, kind: event, title: "Last day of classes", date: 2026-12-10}
+  - {course: CMSC330, kind: exam, title: "Final Exam", date: 2026-12-15, time: "18:30",
+     weight: "22%", notes: "6:30–8:30 pm. Same day as the BCHM461 final (10:30 am)."}
+
+  # ───────────────────────────── CMSC351 — Algorithms (Kruskal)
+  - {course: CMSC351, kind: assignment, title: "Homework 0", date: 2026-09-11,
+     weight: "1%", notes: "CMSC250 review: summations, logs, IBP (P5), induction, constructive induction, Θ, permutation probability. PDF, legible."}
+  - {course: CMSC351, kind: expected, title: "NP-completeness assignment (date TBD)",
+     weight: "0.5–1%", notes: "Cadence ≈ every other Wednesday. Find the real due date on ELMS."}
+  - {course: CMSC351, kind: exam, title: "Midterm 1", date: 2026-10-21, time: "18:30",
+     weight: "TBD", notes: "6:30–8:30 pm, evening. Exam-conflict contact: ramans@umd.edu."}
+  - {course: CMSC351, kind: exam, title: "Midterm 2", date: 2026-11-18, time: "18:30",
+     weight: "TBD", notes: "6:30–8:30 pm, evening. Middle of the worst week of the semester."}
+  - {course: CMSC351, kind: exam, title: "Final Exam", date: 2026-12-16, time: "18:30",
+     weight: "TBD", notes: "6:30–8:30 pm. Fourth final in three days."}
+
+  # ───────────────────────────── MATH246 — Differential Equations (Mellet)
+  - {course: MATH246, kind: quiz, title: "Quiz 1", date: 2026-09-11,
+     weight: "10% total across 6", notes: "In discussion. No books, notes, or calculators. No make-ups. Scope: Ch. I 0.1–0.3, 1.1–1.2, 2.1–2.5, 3.1–3.4, 4.1–4.2, 5.1–5.4."}
+  - {course: MATH246, kind: assignment, title: "Matlab 1", date: 2026-09-21,
+     weight: "5% total across 6", notes: "Online upload (Canvas)."}
+  - {course: MATH246, kind: quiz, title: "Quiz 2", date: 2026-09-25,
+     weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. I 6.1–6.4, 7.1–7.4, 9.1–9.3."}
+  - {course: MATH246, kind: assignment, title: "Matlab 2", date: 2026-10-05,
+     weight: "5% total across 6", notes: "Online. The day before Exam 1."}
+  - {course: MATH246, kind: exam, title: "Exam 1", date: 2026-10-06, time: "11:00",
+     weight: "25%", notes: "In lecture (TuTh 11:00–12:15, ARM 0135). Scope: all Ch. I + Ch. II 1.1–1.3, 2.1–2.6, 3.1–3.3.1. No notes/calculator. SAME DAY as CMSC330 Exam 1."}
+  - {course: MATH246, kind: event, title: "Fall break — Tuesday lecture cancelled", date: 2026-10-13}
+  - {course: MATH246, kind: quiz, title: "Quiz 3", date: 2026-10-16,
+     weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. II 4.1–4.5, 5.1–5.2, 6.1, 6.3."}
+  - {course: MATH246, kind: assignment, title: "Matlab 3", date: 2026-10-19, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: quiz, title: "Quiz 4", date: 2026-10-30,
+     weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. II 6.4, 7.1–7.3, 8.1–8.5, 9.1–9.2, 9.4–9.5."}
+  - {course: MATH246, kind: assignment, title: "Matlab 4", date: 2026-11-02, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: exam, title: "Exam 2", date: 2026-11-10, time: "11:00",
+     weight: "25%", notes: "In lecture. Scope: Ch. II 4.1–9.9 + Ch. III 1.1–1.3, 1.5, 2.1, 3.1–3.2. No notes/calculator."}
+  - {course: MATH246, kind: assignment, title: "Matlab 5", date: 2026-11-16,
+     weight: "5% total across 6", notes: "Online. Monday of the worst week of the semester."}
+  - {course: MATH246, kind: quiz, title: "Quiz 5", date: 2026-11-20,
+     weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. III 2.2–2.5, 5.1–5.3."}
+  - {course: MATH246, kind: event, title: "Thanksgiving — Thursday lecture cancelled", date: 2026-11-26}
+  - {course: MATH246, kind: quiz, title: "Quiz 6", date: 2026-12-04,
+     weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. III 5.4–5.5, 7.1–7.3, 8.1–8.4."}
+  - {course: MATH246, kind: assignment, title: "Matlab 6", date: 2026-12-07, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: exam, title: "Final Exam", date: 2026-12-14, time: "16:00",
+     weight: "35%", notes: "4:00–6:00 pm. Cumulative. Ch. III 9.1–9.5 and 10.1–10.4 are taught the final week with no quiz before this."}
+
+  # ───────────────────────────── ENGL390 — Science Writing (Jawed, sec 1902 Thu 6:30 pm)
+  - {course: ENGL390, kind: assignment, title: "Intro discussion board post + ≥3 peer responses", date: 2026-09-11, time: "23:59",
+     weight: "low-stakes (partial credit if any sub-task missed)", notes: "Post early so there are peers to respond to. 3 is the floor."}
+  - {course: ENGL390, kind: expected, title: "Reflective essay 1 (beginning of semester)", notes: "Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Job description + résumé (draft → final)", notes: "Follow her section order and formats exactly. Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Cover letter (draft → final)", notes: "~1 page; her paragraph template. Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Curriculum vitae (draft → final)", notes: "> 2 pages, full citations. Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Personal statement", notes: "Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Audience analysis + topic selection/dissemination", notes: "Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Reflective essay 2 (mid-semester)", notes: "Date on Canvas."}
+  - {course: ENGL390, kind: expected, title: "Review paper (draft → final)", notes: "Book the protected 1:1 conference. Late drafts are NOT accepted."}
+  - {course: ENGL390, kind: expected, title: "Grant proposal (draft → final)", notes: "Book the protected 1:1 conference. Late drafts are NOT accepted."}
+
+recurring:
+  - {course: CMSC330, kind: expected, title: "Lecture quiz (weekly)", weekday: MON, time: "23:59",
+     from: 2026-09-07, until: 2026-12-07, weight: "2% total",
+     notes: "Released Thu/Fri on Gradescope, due Monday 11:59 pm. Open notes, AI allowed. Lowest 20% of questions dropped."}
+  - {course: CMSC351, kind: expected, title: "Regular homework (weekly)", weekday: FRI, time: null,
+     from: 2026-09-18, until: 2026-12-11, weight: "1% each",
+     notes: "Typically due Fridays. Late = 20% off; ONE late card all semester. PDF, legible.",
+     skip: [2026-11-27]}

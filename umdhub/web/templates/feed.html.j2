@@ -1,0 +1,30 @@
+{% extends "base.html.j2" %}
+{% block title %}Feed · UMD Hub{% endblock %}
+{% block content %}
+<h1>Feed</h1>
+<p class="tools">
+  <a class="btn {% if unread %}on{% endif %}" href="/feed?unread=1">unread</a>
+  <a class="btn {% if not unread %}on{% endif %}" href="/feed">all</a>
+  {% for s in ['email', 'piazza', 'canvas_announce', 'site_diff'] %}<a class="btn {% if source == s %}on{% endif %}" href="/feed?source={{ s }}{% if unread %}&unread=1{% endif %}">{{ s }}</a>{% endfor %}
+  <form method="post" action="/feed/read-all" class="inline"><button class="quiet">mark all read</button></form>
+</p>
+{% if not rows %}<p class="empty">nothing here{% if unread %} — everything's read{% endif %}.</p>{% endif %}
+<ul class="feed">
+  {% for f in rows %}
+  <li class="{% if not f.read_at %}unread{% endif %}" data-fid="{{ f.id }}">
+    <details>
+      <summary>
+        {% if f.course %}<a class="pill sm" style="--c: {{ courses[f.course].color if f.course in courses else '#888' }}" href="/course/{{ f.course }}">{{ f.course }}</a>{% endif %}
+        <span class="src">{{ f.source }}</span>
+        {% if f.is_instructor %}<span class="tag">instructor</span>{% endif %}
+        <span class="subject">{{ f.subject }}</span>
+        <span class="when">{{ f.posted_at|et }}</span>
+      </summary>
+      <div class="meta">{% if f.author %}from {{ f.author }} · {% endif %}{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener">open ↗</a> · {% endif %}extract: {{ f.extract_status }}</div>
+      <pre class="body">{{ f.body }}</pre>
+      {% if not f.read_at %}<button class="quiet" data-feed-read="{{ f.id }}">mark read</button>{% endif %}
+    </details>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

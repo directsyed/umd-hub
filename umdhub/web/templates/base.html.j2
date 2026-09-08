@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>{% block title %}UMD Hub{% endblock %}</title>
+<link rel="stylesheet" href="/static/hub.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐢</text></svg>">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">🐢 Hub</a>
+  <nav>
+    <a href="/" {% if request.url.path == '/' %}class="on"{% endif %}>Today</a>
+    <a href="/feed?unread=1" {% if request.url.path == '/feed' %}class="on"{% endif %}>Feed{% if badges.unread %} <b class="badge">{{ badges.unread }}</b>{% endif %}</a>
+    <a href="/candidates" {% if request.url.path == '/candidates' %}class="on"{% endif %}>Tray{% if badges.candidates %} <b class="badge warn">{{ badges.candidates }}</b>{% endif %}</a>
+    <a href="/credentials" {% if request.url.path == '/credentials' %}class="on"{% endif %}>Keys{% if badges.failing %} <b class="badge bad">{{ badges.failing|length }}</b>{% endif %}</a>
+    <a href="/backlog" {% if request.url.path == '/backlog' %}class="on"{% endif %}>DW</a>
+    <a href="/status" {% if request.url.path == '/status' %}class="on"{% endif %}>Status</a>
+  </nav>
+  <button id="refresh-btn" class="refresh {% if badges.in_progress %}busy{% endif %}" title="Refresh now">
+    {% if badges.in_progress %}⟳ running{% else %}⟳{% endif %}
+  </button>
+</header>
+<div class="courses">
+  {% for code, c in courses.items() %}<a class="pill" style="--c: {{ c.color }}" href="/course/{{ code }}">{{ code }}</a>{% endfor %}
+</div>
+{% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+{% if badges.stale %}<div class="flash warn">Last refresh: {% if badges.last_refresh %}{{ badges.last_refresh|et }}{% else %}never{% endif %} — data may be stale.</div>{% endif %}
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer>UMD Hub v{{ version }} · {{ now_et }} ET{% if badges.last_refresh %} · refreshed {{ badges.last_refresh|et }}{% endif %}</footer>
+<script src="/static/hub.js"></script>
+</body>
+</html>

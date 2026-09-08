@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
+<title>UMD Hub · login</title><link rel="stylesheet" href="/static/hub.css"></head>
+<body class="login">
+<main>
+  <h1>🐢 UMD Hub</h1>
+  {% if no_secret %}<p class="flash warn">HUB_SHARED_SECRET is not set in secrets.env — access is by network only.</p><p><a class="btn" href="/">continue</a></p>
+  {% else %}
+  {% if bad %}<p class="flash bad">wrong key</p>{% endif %}
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{ next }}">
+    <input name="key" type="password" placeholder="shared secret" autofocus autocomplete="current-password">
+    <button class="primary">enter</button>
+  </form>
+  <p class="dim">Tip: bookmark <code>/login?key=…</code> once on each device; the cookie lasts 90 days.</p>
+  {% endif %}
+</main>
+<footer>v{{ version }}</footer>
+</body></html>

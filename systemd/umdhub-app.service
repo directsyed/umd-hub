@@ -1,0 +1,30 @@
+# UMD Hub web app — persistent user service.
+# Install:
+#   mkdir -p ~/.config/systemd/user
+#   cp systemd/umdhub-*.service systemd/umdhub-*.timer ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now umdhub-app.service umdhub-refresh.timer
+# NOTE: the project path contains spaces — systemd wants them as \x20 in
+# ExecStart. Do NOT "fix" them to literal spaces; that breaks the unit.
+[Unit]
+Description=UMD Hub web app (FastAPI on :8765)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/syed/Shared/Computing Projects/UMD Hub
+# "-" prefix: don't fail while secrets.env doesn't exist yet.
+EnvironmentFile=-/home/syed/Shared/Computing Projects/UMD Hub/secrets.env
+ExecStart=/home/syed/Shared/Computing\x20Projects/UMD\x20Hub/.venv/bin/python -m umdhub.app
+Restart=on-failure
+RestartSec=5
+MemoryHigh=384M
+MemoryMax=512M
+TasksMax=64
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

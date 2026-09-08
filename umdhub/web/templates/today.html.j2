@@ -1,0 +1,46 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import item_row with context %}
+{% block title %}Today · UMD Hub{% endblock %}
+{% block content %}
+{% if overdue %}
+<section class="overdue">
+  <h2>Overdue <span class="count">{{ overdue|length }}</span></h2>
+  <ul class="items">{% for it in overdue %}{{ item_row(it, show_date=True) }}{% endfor %}</ul>
+</section>
+{% endif %}
+
+{% for d in days %}
+<section class="day {% if loop.first %}today{% endif %}">
+  <h2>{{ d.label }} <span class="date">{{ d.date }}</span></h2>
+  {% if d.rows %}
+  <ul class="items">{% for it in d.rows %}{{ item_row(it) }}{% endfor %}</ul>
+  {% else %}<p class="empty">nothing due</p>{% endif %}
+</section>
+{% endfor %}
+
+<section>
+  <details open>
+    <summary><h2>Next 7–14 days <span class="count">{{ later|length }}</span></h2></summary>
+    {% if later %}<ul class="items">{% for it in later %}{{ item_row(it, show_date=True) }}{% endfor %}</ul>
+    {% else %}<p class="empty">nothing scheduled</p>{% endif %}
+  </details>
+</section>
+
+<section>
+  <details>
+    <summary><h2>Beyond (2–6 weeks) <span class="count">{{ beyond|length }}</span></h2></summary>
+    <ul class="items">{% for it in beyond %}{{ item_row(it, show_date=True) }}{% endfor %}</ul>
+  </details>
+</section>
+
+{% if snoozed %}
+<section>
+  <details>
+    <summary><h2>Snoozed <span class="count">{{ snoozed|length }}</span></h2></summary>
+    <ul class="items">{% for it in snoozed %}{{ item_row(it, show_date=True) }}{% endfor %}</ul>
+  </details>
+</section>
+{% endif %}
+
+<p class="tools"><a class="btn" href="/item/new">+ add item</a></p>
+{% endblock %}

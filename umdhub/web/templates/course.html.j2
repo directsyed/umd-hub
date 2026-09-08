@@ -1,0 +1,61 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import item_row with context %}
+{% block title %}{{ code }} · UMD Hub{% endblock %}
+{% block content %}
+<h1><span class="pill" style="--c: {{ course.color }}">{{ code }}</span> {{ course.name }}</h1>
+
+{% if past %}
+<section class="overdue">
+  <h2>Past due / not marked done <span class="count">{{ past|length }}</span></h2>
+  <ul class="items">{% for it in past %}{{ item_row(it, show_course=False, show_date=True) }}{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section>
+  <h2>Upcoming <span class="count">{{ upcoming|length }}</span></h2>
+  {% if upcoming %}<ul class="items">{% for it in upcoming %}{{ item_row(it, show_course=False, show_date=True) }}{% endfor %}</ul>
+  {% else %}<p class="empty">nothing scheduled</p>{% endif %}
+</section>
+
+{% if undated %}
+<section>
+  <h2>Expected / no date yet <span class="count">{{ undated|length }}</span></h2>
+  <ul class="items">{% for it in undated %}{{ item_row(it, show_course=False) }}{% endfor %}</ul>
+</section>
+{% endif %}
+
+{% if grades %}
+<section>
+  <h2>Grades</h2>
+  <table class="grades">
+    {% for g in grades %}<tr><td>{{ g.title }}</td><td>{% if g.score is not none %}{{ g.score }}{% if g.max_score %} / {{ g.max_score }}{% endif %}{% else %}—{% endif %}</td><td class="dim">{{ g.source }}</td></tr>{% endfor %}
+  </table>
+</section>
+{% endif %}
+
+{% if feed %}
+<section>
+  <details>
+    <summary><h2>Recent messages <span class="count">{{ feed|length }}</span></h2></summary>
+    <ul class="feed">
+      {% for f in feed %}
+      <li class="{% if not f.read_at %}unread{% endif %}">
+        <details><summary><span class="src">{{ f.source }}</span> {{ f.subject }} <span class="when">{{ f.posted_at|et }}</span></summary>
+          <pre class="body">{{ f.body }}</pre>{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener">open ↗</a>{% endif %}
+        </details>
+      </li>
+      {% endfor %}
+    </ul>
+  </details>
+</section>
+{% endif %}
+
+<section>
+  <details>
+    <summary><h2>Done / cancelled <span class="count">{{ archive|length }}</span></h2></summary>
+    <ul class="items">{% for it in archive %}{{ item_row(it, show_course=False, show_date=True) }}{% endfor %}</ul>
+  </details>
+</section>
+
+<p class="tools"><a class="btn" href="/item/new?course={{ code }}">+ add item</a></p>
+{% endblock %}

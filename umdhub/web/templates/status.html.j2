@@ -1,0 +1,46 @@
+{% extends "base.html.j2" %}
+{% block title %}Status · UMD Hub{% endblock %}
+{% block content %}
+<h1>Status</h1>
+<section>
+  <table class="kv">
+    <tr><td>last refresh</td><td>{% if badges.last_refresh %}{{ badges.last_refresh|et }}{% else %}never{% endif %}{% if badges.in_progress %} <span class="tag">running now</span>{% endif %}</td></tr>
+    <tr><td>items</td><td>{{ item_count }}</td></tr>
+    <tr><td>db size</td><td>{{ (db_size / 1024)|round(1) }} KB</td></tr>
+    <tr><td>auth mode</td><td class="mono">{{ cfg.web.auth_mode }} · {{ cfg.web.allowed_cidrs|join(', ') }}</td></tr>
+  </table>
+  <form method="post" action="/refresh"><button class="primary">refresh now</button></form>
+</section>
+
+<section>
+  <h2>Sources (48 h)</h2>
+  <table class="kv">
+    {% for name in order %}
+    {% set h = health.get(name) %}
+    <tr>
+      <td class="mono">{{ name }}</td>
+      <td>{% if not enabled[name] %}<span class="tag">off</span>{% elif not h %}<span class="tag">no runs</span>{% elif h.ok %}<span class="tag good">ok</span>{% else %}<span class="tag bad">fail</span>{% endif %}</td>
+      <td class="dim">{% if h %}{{ h.runs }} runs · {{ h.failures }} failed{% if h.last_ok %} · last ok {{ h.last_ok|et }}{% endif %}{% if h.last_error %}<div class="err">{{ h.last_error }}</div>{% endif %}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>
+
+{% if summary.extract or summary.notify %}
+<section>
+  <h2>Last pass — optional stages</h2>
+  <pre class="body">{{ summary.extract|tojson(indent=1) if summary.extract else '' }}
+{{ summary.notify|tojson(indent=1) if summary.notify else '' }}</pre>
+</section>
+{% endif %}
+
+<section>
+  <h2>Recent runs</h2>
+  <table class="runs">
+    <tr><th>started</th><th>src</th><th>trig</th><th>ok</th><th>fetched</th><th>new</th><th>upd</th><th>error</th></tr>
+    {% for r in runs %}
+    <tr class="{% if not r.ok %}bad{% endif %}"><td>{{ r.started_at|et }}</td><td class="mono">{{ r.source }}</td><td>{{ r.trigger }}</td><td>{{ '✓' if r.ok else '✗' }}</td><td>{{ r.fetched or 0 }}</td><td>{{ r.new_count or 0 }}</td><td>{{ r.updated_count or 0 }}</td><td class="dim">{{ r.error or '' }}</td></tr>
+    {% endfor %}
+  </table>
+</section>
+{% endblock %}

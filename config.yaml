@@ -1,0 +1,128 @@
+# UMD Hub — all tunables. Secrets live in secrets.env (see secrets.env.example).
+
+semester:
+  name: "Fall 2026"
+  year: 2026
+  start: "2026-08-31"
+  end: "2026-12-16"
+  timezone: "America/New_York"
+
+paths:
+  db: "state.sqlite"
+  seed: "seed/fall-2026.yaml"
+  lock: "state/refresh.lock"
+  study_repo: "/home/syed/Shared/University of Maryland"
+  backlog_file: "Claude Master/deferred-work-backlog.md"
+
+web:
+  bind: "0.0.0.0"
+  port: 8765
+  # lan  = allow only allowed_cidrs AND the HUB_SHARED_SECRET cookie
+  # both = lan rule for LAN/VPN clients; tunnel traffic (127.0.0.1) must carry a valid Cloudflare Access JWT
+  auth_mode: "lan"
+  allowed_cidrs: ["10.0.0.0/24", "10.10.0.0/24", "127.0.0.1/32", "::1/128"]
+  cookie_days: 90
+  stale_after_hours: 14
+  refresh_unit: "umdhub-refresh.service"
+
+courses:
+  BCHM461:
+    name: "Biochemistry I"
+    color: "#c084fc"
+    canvas_names: ["BCHM461", "BCHM 461"]
+    email_senders: ["yxliu@umd.edu", "hhemesat@umd.edu"]
+    subject_tokens: ["BCHM461", "BCHM 461"]
+    gradescope_short: ["BCHM461", "BCHM 461"]
+    piazza_names: ["BCHM461", "BCHM 461"]
+  CMSC330:
+    name: "Organization of Programming Languages"
+    color: "#f59e0b"
+    canvas_names: ["CMSC330", "CMSC 330"]
+    email_senders: ["cyb@umd.edu"]
+    subject_tokens: ["[CMSC330]", "CMSC330", "CMSC 330"]
+    gradescope_short: ["CMSC330", "CMSC 330"]
+    piazza_names: ["CMSC330", "CMSC 330"]
+  CMSC351:
+    name: "Introduction to Algorithms"
+    color: "#34d399"
+    canvas_names: ["CMSC351", "CMSC 351"]
+    email_senders: ["wwongkam@umd.edu", "ramans@umd.edu", "kruskal@umd.edu"]
+    subject_tokens: ["CMSC351", "CMSC 351", "351"]
+    gradescope_short: ["CMSC351", "CMSC 351"]
+    piazza_names: ["CMSC351", "CMSC 351"]
+  MATH246:
+    name: "Differential Equations"
+    color: "#60a5fa"
+    canvas_names: ["MATH246", "MATH 246"]
+    email_senders: ["mellet@umd.edu"]
+    subject_tokens: ["MATH246", "MATH 246", "Math 246"]
+    gradescope_short: ["MATH246", "MATH 246"]
+    piazza_names: ["MATH246", "MATH 246"]
+  ENGL390:
+    name: "Science Writing"
+    color: "#f472b6"
+    canvas_names: ["ENGL390", "ENGL 390"]
+    email_senders: ["ajawed@umd.edu"]
+    subject_tokens: ["ENGL390", "ENGL 390"]
+    gradescope_short: []
+    piazza_names: ["ENGL390", "ENGL 390"]
+
+# Collector order is fixed in umdhub.refresh; this just enables/tunes each source.
+sources:
+  seed:
+    enabled: true
+  canvas_ics:
+    enabled: true
+  gradescope:
+    enabled: true
+    term: "Fall 2026"
+    base_url: "https://www.gradescope.com"
+    per_course_sleep_s: 1.0
+  canvas_api:
+    enabled: false
+    base_url: "https://umd.instructure.com"
+  email_imap:
+    enabled: true
+    lookback_days: 14
+    max_messages_per_run: 200
+    sender_domains: ["umd.edu", "instructure.com", "gradescope.com", "piazza.com", "terpmail.umd.edu"]
+    mailbox: "INBOX"
+  piazza:
+    enabled: true
+    max_posts_per_class: 30
+  course_site:
+    enabled: true
+    sites:
+      CMSC330:
+        url: "https://bakalian.cs.umd.edu/cmsc330/"
+        pages: ["", "announcements"]
+        parser: "cmsc330_home"
+      CMSC351:
+        url: ""
+        pages: [""]
+        parser: "generic"
+        enabled: false
+  backlog:
+    enabled: true
+
+extract:
+  enabled: true
+  claude_bin: "claude"
+  model: "haiku"
+  batch_size: 8
+  max_batch_chars: 12000
+  max_body_chars: 3000
+  min_body_chars: 40
+  max_batches_per_run: 5
+  timeout_s: 120
+  time_box_s: 480
+  budget_usd: 0.25
+  sources: ["email", "piazza", "canvas_announce", "site_diff"]
+
+notify:
+  enabled: true
+  discord_webhook_env: "DISCORD_WEBHOOK_URL"
+  username: "umd-hub"
+  due_soon_hours: 24
+  backlog_alert_days: 8
+  credential_stale_days: 3

@@ -1,0 +1,24 @@
+{% extends "base.html.j2" %}
+{% block title %}DW backlog · UMD Hub{% endblock %}
+{% block content %}
+<h1>Deferred-work backlog</h1>
+<p class="dim">Graded artifacts submitted without the skill being independently reproducible. Each closes only on a cold rep. Read from <code>{{ path }}</code>.</p>
+{% if not exists %}<p class="flash warn">backlog file not found.</p>{% endif %}
+{% set open_rows = rows|selectattr('open')|list %}
+{% if not open_rows %}<p class="empty">no open items.</p>{% endif %}
+<ul class="dw">
+  {% for r in open_rows %}
+  <li class="sev-{{ r.severity }}">
+    <div class="row">
+      <b class="mono">{{ r.id }}</b>
+      <a class="pill sm" style="--c: {{ courses[r.course].color if r.course in courses else '#888' }}" href="/course/{{ r.course }}">{{ r.course }}</a>
+      <span class="title">{{ r.artifact }}</span>
+      <span class="when">{{ r.age_days }} d · {{ r.band }}</span>
+    </div>
+    <div class="meta">{{ r.topic }} · reps: <b>{{ r.reps }}</b> · {{ r.status }}</div>
+  </li>
+  {% endfor %}
+</ul>
+{% set closed = rows|rejectattr('open')|list %}
+{% if closed %}<details><summary>closed ({{ closed|length }})</summary><ul class="plain">{% for r in closed %}<li>{{ r.id }} · {{ r.course }} · {{ r.artifact }}</li>{% endfor %}</ul></details>{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html.j2" %}
+{% block title %}Add item · UMD Hub{% endblock %}
+{% block content %}
+<h1>Add item</h1>
+<form method="post" action="/item/new" class="stack">
+  <label>Course <select name="course">{% for code in courses %}<option {% if request.query_params.get('course') == code %}selected{% endif %}>{{ code }}</option>{% endfor %}</select></label>
+  <label>Kind <select name="kind">{% for k in KINDS if k != 'expected' %}<option>{{ k }}</option>{% endfor %}</select></label>
+  <label>Title <input name="title" required autofocus placeholder="Homework 2"></label>
+  <label>Due date <input name="due_date" type="date"></label>
+  <label>Time (blank = all day) <input name="due_time" type="time"></label>
+  <label>Link <input name="url" type="url" placeholder="https://"></label>
+  <label>Notes <textarea name="notes" rows="2"></textarea></label>
+  <button class="primary">add</button>
+</form>
+{% endblock %}
