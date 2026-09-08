@@ -115,7 +115,7 @@ seconds (first one lists everything due in 24 h plus any credential/source probl
 emails/Piazza posts that came in, and **Tray** for any deadlines the extractor pulled from them — confirm or reject
 each; nothing reaches the calendar without you.
 
-## 3. Checks
+## 6. Checks
 
 ```bash
 .venv/bin/python -m umdhub.refresh --dry-run                 # every enabled source, no writes
@@ -125,7 +125,7 @@ journalctl --user -u umdhub-refresh -n 50 --no-pager
 curl -s http://127.0.0.1:8765/healthz
 ```
 
-## 4. Phase B — Cloudflare Tunnel + Access (after registering a domain)
+## 7. Phase B — Cloudflare Tunnel + Access (after registering a domain)
 
 ```bash
 sudo mkdir -p --mode=0755 /usr/share/keyrings
