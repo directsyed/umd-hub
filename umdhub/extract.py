@@ -224,6 +224,13 @@ def run(cfg: Config, state: State) -> dict:
         if payload is None:
             payload = call_claude(cfg, sys_prompt, user_msg)  # one retry
         if payload is None:
+            if stats["batches"] == 0:
+                # Nothing has worked this run → almost certainly the CLI itself (auth, quota,
+                # binary). Leave the items pending so they're picked up once it's fixed.
+                stats["error"] = (f"claude -p failed on the first batch; {len(ids)} feed item(s) left pending "
+                                  f"— run `python -m umdhub.probe claude`")
+                log.warning("extract: %s", stats["error"])
+                break
             state.set_extract_status(ids, "failed")
             stats["failed"] += len(ids)
         else:

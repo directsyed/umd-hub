@@ -28,6 +28,11 @@ def probe_claude(cfg) -> tuple[bool, str]:
         return False, f"{cfg.extract.claude_bin} not found on PATH"
     except subprocess.TimeoutExpired:
         return False, "claude -p timed out (auth prompt waiting for a browser?)"
+    blob = (r.stdout or "") + (r.stderr or "")
+    if "authentication_error" in blob or "OAuth" in blob or "Failed to authenticate" in blob:
+        return False, ("NOT AUTHENTICATED — the Claude Code CLI's stored login has expired. Fix: open a terminal "
+                       "on this server and run `claude` once (it will re-authenticate in the browser), then re-run "
+                       "this probe. The Hub never uses --bare, so the subscription login is what it needs.")
     if r.returncode != 0:
         return False, f"exit {r.returncode}: {(r.stderr or r.stdout)[:300].strip()}"
     try:

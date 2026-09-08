@@ -53,19 +53,20 @@ def test_run_creates_tray_candidate_and_auto_merges_known_exam(xcfg, seeded):
     assert extract.run(xcfg, seeded)["batches"] == 0
 
 
-def test_run_marks_failed_on_cli_error(xcfg, seeded, monkeypatch):
+def test_cli_failure_on_first_batch_leaves_items_pending(xcfg, seeded, monkeypatch):
     fid = _feed(seeded)
     monkeypatch.setenv("FAKE_CLAUDE_MODE", "fail")
     stats = extract.run(xcfg, seeded)
-    assert stats["failed"] == 1 and stats["candidates"] == 0
-    assert seeded.feed_item(fid)["extract_status"] == "failed"
+    assert "error" in stats and stats["candidates"] == 0 and stats["failed"] == 0
+    assert seeded.feed_item(fid)["extract_status"] == "pending"     # retried next run, not lost
 
 
-def test_run_marks_failed_on_garbage(xcfg, seeded, monkeypatch):
+def test_garbage_output_on_first_batch_leaves_items_pending(xcfg, seeded, monkeypatch):
     fid = _feed(seeded)
     monkeypatch.setenv("FAKE_CLAUDE_MODE", "garbage")
-    extract.run(xcfg, seeded)
-    assert seeded.feed_item(fid)["extract_status"] == "failed"
+    stats = extract.run(xcfg, seeded)
+    assert "error" in stats
+    assert seeded.feed_item(fid)["extract_status"] == "pending"
 
 
 def test_prose_wrapped_json_still_parses(xcfg, seeded, monkeypatch):
