@@ -26,6 +26,21 @@ sudo ufw allow from 10.10.0.0/24 to any port 8765 proto tcp comment umdhub-wg
 
 Then open `http://10.0.0.200:8765/login?key=<HUB_SHARED_SECRET>` once per device (cookie lasts 90 days).
 
+## 1b. Headless Claude auth for the extractor (step 1, done right)
+
+`claude auth status` can say "logged in" while `claude -p` still fails with *OAuth access token has
+expired*: the desktop app refreshes its own token and never writes it back to `~/.claude/.credentials.json`.
+A systemd service needs a token that doesn't depend on that file:
+
+```bash
+claude setup-token          # in an SSH terminal on syedlab; opens a browser URL, prints a long-lived token
+nano "/home/syed/Shared/Computing Projects/UMD Hub/secrets.env"   # paste it after CLAUDE_CODE_OAUTH_TOKEN=
+cd "/home/syed/Shared/Computing Projects/UMD Hub" && .venv/bin/python -m umdhub.probe claude   # probe loads secrets.env itself
+```
+
+The probe must print `OK claude replied 'pong'`. The refresh service loads `secrets.env`, so it picks the
+token up on its next run — nothing to restart.
+
 ## 2. First login (step 3)
 
 `secrets.env` already holds a generated `HUB_SHARED_SECRET`. Print it, then open the login URL once

@@ -73,7 +73,10 @@ def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | N
         "--permission-mode", "dontAsk",
         "--max-budget-usd", str(cfg.extract.budget_usd),
     ]
-    env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE_CODE_")}
+    # Drop nested-session variables (when run from inside an interactive Claude Code session) but
+    # keep the long-lived token that headless runs authenticate with (`claude setup-token`).
+    env = {k: v for k, v in os.environ.items()
+           if not k.startswith("CLAUDE_CODE_") or k == "CLAUDE_CODE_OAUTH_TOKEN"}
     with tempfile.TemporaryDirectory(prefix="umdhub-extract-") as cwd:
         try:
             r = subprocess.run(cmd, input=user_msg, capture_output=True, text=True,
