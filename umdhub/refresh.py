@@ -60,6 +60,10 @@ def _run_source(cfg: Config, name: str, state: State, http: HttpClient, *, run_g
                 _, was_new, changed = state.upsert_item(it)
                 stats["new"] += int(was_new)
                 stats["updated"] += int(changed)
+            if name == "seed" and res.items:
+                pruned = state.prune_seed_orphans({it.source_id for it in res.items})
+                if pruned:
+                    stats["notes"].append(f"pruned {pruned} item(s) no longer in the seed")
             for f in res.feed_items:
                 _, is_new = state.upsert_feed_item(f)
                 stats["feed_new"] += int(is_new)

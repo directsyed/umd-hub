@@ -192,6 +192,52 @@ class State:
         )
         return int(cur.lastrowid)
 
+    def prune_seed_orphans(self, seen_source_ids: set[str]) -> int:
+        """After a seed run: drop seed links the seed file no longer contains, and delete items that
+        were seed-only, untouched (still open, seed-primary) and now unlinked. Returns items deleted."""
+        rows = self.conn.execute("SELECT item_id, source_id FROM item_source WHERE source='seed'").fetchall()
+        stale = [r for r in rows if r["source_id"] not in seen_source_ids]
+        deleted = 0
+        if not stale:
+            return 0
+        with self.transaction():
+            for r in stale:
+                self.conn.execute("DELETE FROM item_source WHERE source='seed' AND source_id=?", (r["source_id"],))
+                left = self.conn.execute("SELECT COUNT(*) FROM item_source WHERE item_id=?",
+                                         (r["item_id"],)).fetchone()[0]
+                if left == 0:
+                    cur = self.conn.execute(
+                        "DELETE FROM item WHERE id=? AND status='open' AND primary_source='seed'", (r["item_id"],))
+                    deleted += cur.rowcount
+        return deleted
+
+    def merge_items(self, keep_id: int, drop_id: int) -> None:
+        """Fold item `drop` into item `keep`: move source links/grades/candidates, keep the more
+        user-touched status, fill empty notes/weight from the dropped row, delete it."""
+        keep = dict(self.item(keep_id))
+        drop = dict(self.item(drop_id))
+        with self.transaction():
+            self.conn.execute("UPDATE item_source SET item_id=? WHERE item_id=?", (keep_id, drop_id))
+            self.conn.execute("UPDATE grade SET item_id=? WHERE item_id=?", (keep_id, drop_id))
+            self.conn.execute("UPDATE candidate SET matched_item_id=? WHERE matched_item_id=?", (keep_id, drop_id))
+            up: dict = {}
+            for f in ("weight_note", "notes", "url", "release_at", "late_due_at", "submission_status", "score"):
+                if not keep.get(f) and drop.get(f):
+                    up[f] = drop[f]
+            if keep["status"] == "open" and drop["status"] != "open":
+                up["status"] = drop["status"]
+                up["snoozed_until"] = drop.get("snoozed_until")
+            if keep["title"] != drop["title"]:
+                note = f"also: {drop['title']}"
+                notes = up.get("notes") or keep.get("notes") or ""
+                if note not in notes:
+                    up["notes"] = (notes + "\n" + note).strip()
+            if up:
+                up["updated_at"] = utcnow_iso()
+                sets = ", ".join(f"{k}=?" for k in up)
+                self.conn.execute(f"UPDATE item SET {sets} WHERE id=?", (*up.values(), keep_id))
+            self.conn.execute("DELETE FROM item WHERE id=?", (drop_id,))
+
     def add_manual_item(self, course: str, kind: str, title: str, due_at: str | None,
                         all_day: bool, notes: str | None = None, url: str | None = None) -> int:
         """User-entered item. Bypasses matching — the user meant a new row."""

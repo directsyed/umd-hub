@@ -11,9 +11,14 @@ def test_helpers(cfg):
     assert parse_cookie_header("Cookie: a=1\nb=2") == {"a": "1", "b": "2"}
     assert parse_cookie_header(None) == {}
     assert classify_kind("Final Exam") == "exam"
+    assert classify_kind("Midterm 1") == "exam"
     assert classify_kind("Lecture Quiz 3") == "quiz"
     assert classify_kind("Project 2") == "project"
+    assert classify_kind("Final Project") == "project"
     assert classify_kind("Homework 0") == "assignment"
+    assert classify_kind("Final Resume, Cover Letter, Personal Statement") == "assignment"
+    assert classify_kind("Final Topic Selection Memo") == "assignment"
+    assert classify_kind("Final", "event") == "exam"
     assert classify_kind("Fall Break", "event") == "event"
     assert guess_course("[CMSC330] Project 1 released", cfg.courses) == "CMSC330"
     assert guess_course("MATH 246 quiz Friday", cfg.courses) == "MATH246"

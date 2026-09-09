@@ -3,22 +3,36 @@ from umdhub.core import merge
 
 def test_normalize_title():
     n = merge.normalize_title
-    assert n("Mid-term Exam I") == "midterm exam 1"
+    assert n("Mid-term Exam I") == "exam 1"                   # midterm ≡ exam, duplicates collapsed
+    assert n("Midterm 1") == "exam 1"
     assert n("HW #3 (Recurrences)") == "homework 3 recurrences"
     assert n("CMSC330 Project 1") == "project 1"
     assert n("Lecture Quiz 3") == "lecture quiz 3"
     assert n("Lecture quiz (weekly)") == "lecture quiz weekly"
     assert n("hw3") == "homework 3"
     assert n("Quiz 2 — 11:59pm") == "quiz 2 11 59pm"
+    assert n("Job description + résumé") == "job description resume"
 
 
 def test_similar():
     s = merge.similar
-    assert s("lecture quiz 3", "lecture quiz weekly")        # jaccard 0.5, numbers don't conflict
+    n = merge.normalize_title
+    assert s("lecture quiz 3", "lecture quiz weekly")        # placeholder word ignored → containment
     assert not s("quiz 1", "quiz 2")                          # number tokens disagree
     assert s("homework 0", "homework 0 cmsc250 review")       # containment
-    assert s("midterm exam 1", "exam 1")                      # containment
+    assert s(n("Mid-term Exam I"), n("Exam 1"))               # midterm ≡ exam
     assert not s("matlab 1", "quiz 1")                        # same number, no overlap otherwise
+    # the real-world pairs that slipped through on 2026-09-09
+    assert s(n("Lecture Quiz 1 - Syllabus, Semantical Rules, Ocaml"), n("Lecture quiz (weekly)"))
+    assert s(n("Introductory Discussion Board Post"), n("Intro discussion board post + ≥3 peer responses"))
+    assert s(n("Midterm 1"), n("Exam 1"))
+    assert s(n("Project 1"), n("Matlab Project 1"))
+    assert s(n("HW1"), n("Regular homework (weekly)"))                       # via Jaccard, not containment
+    assert not s(n("HW0"), n("NP"))
+    assert not s(n("Quiz 1"), n("Lecture quiz (weekly)"))    # discussion quiz ≠ lecture-quiz placeholder
+    # a placeholder reduced to one generic word must not swallow unrelated items
+    assert not s(n("NP-completeness assignment (date TBD)"), n("Regular homework (weekly)"))
+    assert s(n("NP"), n("NP-completeness assignment (date TBD)"))            # specific single token is fine
 
 
 def test_match_prefers_same_course_and_close_date():

@@ -94,22 +94,30 @@ def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:80]
 
 
-_KIND_RES = [
-    ("exam", re.compile(r"\b(final|midterm|mid-term|exam)\b", re.I)),
-    ("quiz", re.compile(r"\bquiz(zes)?\b", re.I)),
-    ("project", re.compile(r"\bproj(ect)?s?\b", re.I)),
-    ("assignment", re.compile(
-        r"\b(homework|hw|assignment|problem\s*set|pset|lab|matlab|discussion|essay|draft|paper|proposal|"
-        r"reflection|worksheet|exercise)\b", re.I)),
-]
+_EXAM_RE = re.compile(r"\b(midterm|mid-term|exam)s?\b", re.I)
+_FINAL_RE = re.compile(r"\bfinal\b", re.I)
+_QUIZ_RE = re.compile(r"\bquiz(zes)?\b", re.I)
+_PROJECT_RE = re.compile(r"\bproj(ect)?s?\b", re.I)
+_ASSIGN_RE = re.compile(
+    r"\b(homework|hw|assignment|problem\s*set|pset|lab|matlab|discussion|essay|draft|paper|proposal|"
+    r"reflection|reflective|worksheet|exercise|memo|statement|resume|résumé|letter|vitae|cv|report|"
+    r"post|response|analysis|submission)\b", re.I)
 
 
 def classify_kind(title: str, default: str = "assignment") -> str:
-    """Kind from a title. Order matters: 'Final Project' is a project, 'Quiz 3 (exam review)' an exam? No —
-    exam words win so that 'Midterm' never files as an assignment; projects beat generic words."""
-    for kind, rx in _KIND_RES:
-        if rx.search(title or ""):
-            return kind
+    """Kind from a title. 'Midterm'/'Exam' always wins; a bare 'Final' is an exam only when no
+    assignment/project word says otherwise ('Final Resume…' and 'Final Project' are not exams)."""
+    t = title or ""
+    if _EXAM_RE.search(t):
+        return "exam"
+    if _QUIZ_RE.search(t):
+        return "quiz"
+    if _PROJECT_RE.search(t):
+        return "project"
+    if _ASSIGN_RE.search(t):
+        return "assignment"
+    if _FINAL_RE.search(t):
+        return "exam"
     return default
 
 

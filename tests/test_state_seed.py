@@ -66,6 +66,38 @@ def test_snooze_and_wake(seeded):
     assert seeded.item(iid)["status"] == "open"
 
 
+def test_prune_seed_orphans(cfg, seeded):
+    items = load_seed(cfg.seed_path(), set(cfg.course_codes()))
+    keep = {i.source_id for i in items}
+    victim = next(i for i in items if i.course == "CMSC330" and i.title == "Quiz 5")
+    before = seeded.count_items()
+    keep.discard(victim.source_id)
+    assert seeded.prune_seed_orphans(keep) == 1
+    assert seeded.count_items() == before - 1
+    # an orphan the user already touched (done) survives
+    victim2 = next(i for i in items if i.course == "CMSC330" and i.title == "Quiz 4")
+    row = seeded.conn.execute("SELECT item_id FROM item_source WHERE source='seed' AND source_id=?",
+                              (victim2.source_id,)).fetchone()
+    seeded.set_status(int(row["item_id"]), "done")
+    keep.discard(victim2.source_id)
+    assert seeded.prune_seed_orphans(keep) == 0
+    assert seeded.item(int(row["item_id"]))["status"] == "done"
+
+
+def test_merge_items_folds_duplicate(seeded):
+    due, _ = tu.from_local("2026-09-07", "23:59")
+    dup = seeded.add_manual_item("CMSC330", "quiz", "Lecture Quiz 1 - Syllabus", due, False, notes="from gs")
+    placeholder = seeded.items_between("2026-09-07", "2026-09-07", course="CMSC330")
+    keep = next(r for r in placeholder if r["primary_source"] == "seed")
+    seeded.set_status(dup, "done")
+    seeded.merge_items(int(keep["id"]), dup)
+    assert seeded.item(dup) is None
+    k = seeded.item(int(keep["id"]))
+    assert k["status"] == "done"                      # user-touched status carried over
+    assert "also: Lecture Quiz 1 - Syllabus" in k["notes"]
+    assert len(seeded.item_sources(int(keep["id"]))) == 2
+
+
 def test_credentials_roundtrip(state):
     state.set_credential("gradescope", "cookie", "  signed_token=abc; _gradescope_session=def  ")
     assert state.creds_for("gradescope") == {"cookie": "signed_token=abc; _gradescope_session=def"}

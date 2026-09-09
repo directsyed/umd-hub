@@ -17,14 +17,14 @@ import subprocess
 import tempfile
 import time
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from .core import merge
 from .core.config import Config
 from .core.models import Candidate
 from .core.state import State
-from .core.timeutil import from_local, today_local, utcnow_iso
+from .core.timeutil import from_local, today_local, utcnow, utcnow_iso
 
 log = logging.getLogger("umdhub.extract")
 HERE = Path(__file__).parent
@@ -198,6 +198,11 @@ def run(cfg: Config, state: State) -> dict:
         stats["error"] = f"{cfg.extract.claude_bin} not on PATH"
         log.warning("extract: %s", stats["error"])
         return stats
+    # Items that failed (timeouts, transient CLI errors) get one more chance every N hours.
+    cutoff = (utcnow() - timedelta(hours=cfg.extract.retry_failed_after_hours)).replace(microsecond=0).isoformat()
+    stats["requeued"] = state.conn.execute(
+        "UPDATE feed_item SET extract_status='pending' WHERE extract_status='failed' AND extracted_at < ?",
+        (cutoff,)).rowcount
     sys_prompt = system_prompt(cfg)
     deadline = time.monotonic() + cfg.extract.time_box_s
     for _ in range(cfg.extract.max_batches_per_run):

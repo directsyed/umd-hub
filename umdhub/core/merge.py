@@ -10,6 +10,7 @@ upgraded to the live kind. User `status` (done/snoozed/cancelled) is never touch
 from __future__ import annotations
 
 import re
+import unicodedata
 from datetime import date
 
 SOURCE_PRIORITY: dict[str, int] = {
@@ -24,14 +25,22 @@ SOURCE_PRIORITY: dict[str, int] = {
 
 _SYNONYMS = {
     "hw": "homework", "hwk": "homework", "hmwk": "homework", "assignment": "homework",
-    "proj": "project", "prj": "project",
-    "midterm": "midterm", "mid-term": "midterm", "mid": "midterm",
-    "exam": "exam", "test": "exam",
+    "proj": "project", "prj": "project", "projects": "project",
+    # Canvas says "Midterm 1", a syllabus says "Exam 1", a professor says "Mid-term Exam I" —
+    # one thing. Consecutive duplicates ("exam exam 1") are collapsed below.
+    "midterm": "exam", "midterms": "exam", "mid-term": "exam", "exams": "exam", "test": "exam",
     "quizzes": "quiz",
     "lec": "lecture",
     "ps": "problemset", "pset": "problemset",
     "wk": "week",
 }
+# Kind words that name a category, not a specific item (stemmed form). A title reduced to one of
+# these alone is too generic to claim another title by containment.
+_GENERIC = {"homew", "quiz", "exam", "proje", "lectu", "lab", "essay", "paper", "draft", "final",
+            "propo", "memo", "assig", "probl", "matla", "work"}
+# Words that only describe a placeholder, never the thing itself; ignored when comparing.
+_PLACEHOLDER = {"weekly", "daily", "biweekly", "recurring", "regular", "tbd", "tba", "date",
+                "optional", "placeholder", "expected"}
 _ORDINALS = {
     "first": "1", "second": "2", "third": "3", "fourth": "4", "fifth": "5",
     "sixth": "6", "seventh": "7", "eighth": "8", "ninth": "9", "tenth": "10",
@@ -49,7 +58,8 @@ def normalize_title(title: str, course: str | None = None) -> str:
     'Mid-term Exam I — Modules I+II' -> 'midterm exam 1 modules 1 2'
     'HW #3 (Recurrences)'            -> 'homework 3 recurrences'
     """
-    s = title.lower()
+    s = unicodedata.normalize("NFKD", title)
+    s = "".join(ch for ch in s if not unicodedata.combining(ch)).lower()   # résumé -> resume
     s = _COURSE_RE.sub(" ", s)
     s = s.replace("mid-term", "midterm").replace("mid term", "midterm")
     s = re.sub(r"(\d)(st|nd|rd|th)\b", r"\1", s)
@@ -69,11 +79,21 @@ def normalize_title(title: str, course: str | None = None) -> str:
             out.extend([word, num])
             continue
         out.append(t)
-    return " ".join(out)
+    deduped: list[str] = []
+    for t in out:
+        if not deduped or deduped[-1] != t:
+            deduped.append(t)
+    return " ".join(deduped)
+
+
+def _stem(t: str) -> str:
+    """Light stemming for comparison only: 'introductory'/'intro', 'responses'/'response'."""
+    return t if (t.isdigit() or len(t) < 6) else t[:5]
 
 
 def tokens(norm: str) -> set[str]:
-    return set(norm.split())
+    """Comparison tokens: stemmed, with placeholder words removed."""
+    return {_stem(t) for t in norm.split() if t not in _PLACEHOLDER}
 
 
 def number_tokens(norm: str) -> set[str]:
@@ -96,7 +116,12 @@ def similar(a_norm: str, b_norm: str) -> bool:
     if na and nb and na != nb:
         return False
     ta, tb = tokens(a_norm), tokens(b_norm)
-    if ta <= tb or tb <= ta:
+    if not ta or not tb:
+        return False
+    small, big = (ta, tb) if len(ta) <= len(tb) else (tb, ta)
+    # Containment: a placeholder like {lecture, quiz} sits inside "Lecture Quiz 1 - Syllabus…".
+    # But a lone generic word ({homework}) would sit inside everything — that needs Jaccard.
+    if small <= big and (len(small) >= 2 or not small <= _GENERIC):
         return True
     return _jaccard(ta, tb) >= 0.5
 

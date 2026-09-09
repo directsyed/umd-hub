@@ -55,31 +55,31 @@ items:
   # ───────────────────────────── MATH246 — Differential Equations (Mellet)
   - {course: MATH246, kind: quiz, title: "Quiz 1", date: 2026-09-11,
      weight: "10% total across 6", notes: "In discussion. No books, notes, or calculators. No make-ups. Scope: Ch. I 0.1–0.3, 1.1–1.2, 2.1–2.5, 3.1–3.4, 4.1–4.2, 5.1–5.4."}
-  - {course: MATH246, kind: assignment, title: "Matlab 1", date: 2026-09-21,
+  - {course: MATH246, kind: assignment, title: "Matlab Project 1", date: 2026-09-21,
      weight: "5% total across 6", notes: "Online upload (Canvas)."}
   - {course: MATH246, kind: quiz, title: "Quiz 2", date: 2026-09-25,
      weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. I 6.1–6.4, 7.1–7.4, 9.1–9.3."}
-  - {course: MATH246, kind: assignment, title: "Matlab 2", date: 2026-10-05,
+  - {course: MATH246, kind: assignment, title: "Matlab Project 2", date: 2026-10-05,
      weight: "5% total across 6", notes: "Online. The day before Exam 1."}
   - {course: MATH246, kind: exam, title: "Exam 1", date: 2026-10-06, time: "11:00",
      weight: "25%", notes: "In lecture (TuTh 11:00–12:15, ARM 0135). Scope: all Ch. I + Ch. II 1.1–1.3, 2.1–2.6, 3.1–3.3.1. No notes/calculator. SAME DAY as CMSC330 Exam 1."}
   - {course: MATH246, kind: event, title: "Fall break — Tuesday lecture cancelled", date: 2026-10-13}
   - {course: MATH246, kind: quiz, title: "Quiz 3", date: 2026-10-16,
      weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. II 4.1–4.5, 5.1–5.2, 6.1, 6.3."}
-  - {course: MATH246, kind: assignment, title: "Matlab 3", date: 2026-10-19, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: assignment, title: "Matlab Project 3", date: 2026-10-19, weight: "5% total across 6", notes: "Online."}
   - {course: MATH246, kind: quiz, title: "Quiz 4", date: 2026-10-30,
      weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. II 6.4, 7.1–7.3, 8.1–8.5, 9.1–9.2, 9.4–9.5."}
-  - {course: MATH246, kind: assignment, title: "Matlab 4", date: 2026-11-02, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: assignment, title: "Matlab Project 4", date: 2026-11-02, weight: "5% total across 6", notes: "Online."}
   - {course: MATH246, kind: exam, title: "Exam 2", date: 2026-11-10, time: "11:00",
      weight: "25%", notes: "In lecture. Scope: Ch. II 4.1–9.9 + Ch. III 1.1–1.3, 1.5, 2.1, 3.1–3.2. No notes/calculator."}
-  - {course: MATH246, kind: assignment, title: "Matlab 5", date: 2026-11-16,
+  - {course: MATH246, kind: assignment, title: "Matlab Project 5", date: 2026-11-16,
      weight: "5% total across 6", notes: "Online. Monday of the worst week of the semester."}
   - {course: MATH246, kind: quiz, title: "Quiz 5", date: 2026-11-20,
      weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. III 2.2–2.5, 5.1–5.3."}
   - {course: MATH246, kind: event, title: "Thanksgiving — Thursday lecture cancelled", date: 2026-11-26}
   - {course: MATH246, kind: quiz, title: "Quiz 6", date: 2026-12-04,
      weight: "10% total across 6", notes: "In discussion. Scope (inferred): Ch. III 5.4–5.5, 7.1–7.3, 8.1–8.4."}
-  - {course: MATH246, kind: assignment, title: "Matlab 6", date: 2026-12-07, weight: "5% total across 6", notes: "Online."}
+  - {course: MATH246, kind: assignment, title: "Matlab Project 6", date: 2026-12-07, weight: "5% total across 6", notes: "Online."}
   - {course: MATH246, kind: exam, title: "Final Exam", date: 2026-12-14, time: "16:00",
      weight: "35%", notes: "4:00–6:00 pm. Cumulative. Ch. III 9.1–9.5 and 10.1–10.4 are taught the final week with no quiz before this."}
 
@@ -87,10 +87,8 @@ items:
   - {course: ENGL390, kind: assignment, title: "Intro discussion board post + ≥3 peer responses", date: 2026-09-11, time: "23:59",
      weight: "low-stakes (partial credit if any sub-task missed)", notes: "Post early so there are peers to respond to. 3 is the floor."}
   - {course: ENGL390, kind: expected, title: "Reflective essay 1 (beginning of semester)", notes: "Date on Canvas."}
-  - {course: ENGL390, kind: expected, title: "Job description + résumé (draft → final)", notes: "Follow her section order and formats exactly. Date on Canvas."}
-  - {course: ENGL390, kind: expected, title: "Cover letter (draft → final)", notes: "~1 page; her paragraph template. Date on Canvas."}
-  - {course: ENGL390, kind: expected, title: "Curriculum vitae (draft → final)", notes: "> 2 pages, full citations. Date on Canvas."}
-  - {course: ENGL390, kind: expected, title: "Personal statement", notes: "Date on Canvas."}
+  # Résumé / cover letter / CV / personal statement / job description placeholders removed 2026-09-09:
+  # Canvas now supplies the real dated assignments ("Resume, Cover Letter, Personal Statement Draft" etc.).
   - {course: ENGL390, kind: expected, title: "Audience analysis + topic selection/dissemination", notes: "Date on Canvas."}
   - {course: ENGL390, kind: expected, title: "Reflective essay 2 (mid-semester)", notes: "Date on Canvas."}
   - {course: ENGL390, kind: expected, title: "Review paper (draft → final)", notes: "Book the protected 1:1 conference. Late drafts are NOT accepted."}
