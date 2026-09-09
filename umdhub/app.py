@@ -440,7 +440,8 @@ def _register(app: FastAPI) -> None:
         return templates.TemplateResponse(request, "status.html.j2", _ctx(
             request, st, runs=st.recent_runs(40), health=st.source_health(48), summary=summary,
             db_size=db_size, item_count=st.count_items(), order=SOURCE_ORDER,
-            enabled={s: cfg.source(s).enabled for s in SOURCE_ORDER}))
+            enabled={s: cfg.source(s).enabled for s in SOURCE_ORDER},
+            lifetime=st.meta_json("extract:lifetime", {}) or {}))
 
     @app.post("/refresh")
     def refresh(request: Request, st: State = Depends(get_state)):

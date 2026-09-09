@@ -1,8 +1,8 @@
 [Unit]
-Description=Fire UMD Hub refresh at 07:00 and 19:00 America/New_York
+Description=Fire UMD Hub refresh at 07:00, 12:00, 17:00 and 22:00 America/New_York
 
 [Timer]
-OnCalendar=*-*-* 07,19:00:00 America/New_York
+OnCalendar=*-*-* 07,12,17,22:00:00 America/New_York
 Persistent=true
 RandomizedDelaySec=120
 Unit=umdhub-refresh.service

@@ -8,6 +8,9 @@
     <tr><td>items</td><td>{{ item_count }}</td></tr>
     <tr><td>db size</td><td>{{ (db_size / 1024)|round(1) }} KB</td></tr>
     <tr><td>auth mode</td><td class="mono">{{ cfg.web.auth_mode }} · {{ cfg.web.allowed_cidrs|join(', ') }}</td></tr>
+    {% if lifetime %}
+    <tr><td>extractor (claude -p), lifetime</td><td class="mono">{{ lifetime.calls }} calls over {{ lifetime.runs }} runs · in {{ lifetime.tokens_in }} + cached {{ lifetime.cache_read }} · out {{ lifetime.tokens_out }} · ≈ ${{ '%.3f'|format(lifetime.cost_usd) }} list price · {{ lifetime.seconds|round(0)|int }} s</td></tr>
+    {% endif %}
   </table>
   <form method="post" action="/refresh"><button class="primary">refresh now</button></form>
 </section>

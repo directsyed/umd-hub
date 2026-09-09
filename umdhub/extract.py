@@ -60,8 +60,29 @@ def build_user_message(rows, cfg: Config) -> str:
     return "\n\n".join(blocks)
 
 
-def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | None = None) -> dict | None:
-    """Run one claude -p invocation. Returns the parsed structured output, or None on failure."""
+def _usage_of(obj: dict, seconds: float) -> dict:
+    """Pull token/cost accounting out of a claude -p result envelope (fields vary by version)."""
+    u = obj.get("usage") or {}
+    return {
+        "calls": 1,
+        "tokens_in": int(u.get("input_tokens") or 0),
+        "cache_read": int(u.get("cache_read_input_tokens") or 0),
+        "cache_write": int(u.get("cache_creation_input_tokens") or 0),
+        "tokens_out": int(u.get("output_tokens") or 0),
+        "cost_usd": float(obj.get("total_cost_usd") or 0.0),
+        "seconds": round(seconds, 1),
+    }
+
+
+def _add_usage(total: dict, part: dict) -> None:
+    for k, v in part.items():
+        total[k] = round(total.get(k, 0) + v, 4) if isinstance(v, float) else total.get(k, 0) + v
+
+
+def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | None = None,
+                usage: dict | None = None) -> dict | None:
+    """Run one claude -p invocation. Returns the parsed structured output, or None on failure.
+    If `usage` is given, token/cost accounting for the call is accumulated into it."""
     cmd = [
         cfg.extract.claude_bin, "-p",
         "--model", cfg.extract.model,
@@ -77,6 +98,7 @@ def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | N
     # keep the long-lived token that headless runs authenticate with (`claude setup-token`).
     env = {k: v for k, v in os.environ.items()
            if not k.startswith("CLAUDE_CODE_") or k == "CLAUDE_CODE_OAUTH_TOKEN"}
+    t0 = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="umdhub-extract-") as cwd:
         try:
             r = subprocess.run(cmd, input=user_msg, capture_output=True, text=True,
@@ -87,6 +109,7 @@ def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | N
         except FileNotFoundError:
             log.error("claude binary %r not found", cfg.extract.claude_bin)
             return None
+    elapsed = time.monotonic() - t0
     if r.returncode != 0:
         log.warning("claude -p exit %s: %s", r.returncode, (r.stderr or r.stdout)[:400].strip())
         return None
@@ -95,6 +118,8 @@ def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | N
     except json.JSONDecodeError:
         log.warning("claude -p returned non-JSON: %s", r.stdout[:200].strip())
         return None
+    if isinstance(obj, dict) and usage is not None:
+        _add_usage(usage, _usage_of(obj, elapsed))
     if isinstance(obj, dict):
         if obj.get("structured_output") is not None:
             return obj["structured_output"]
@@ -194,6 +219,7 @@ def _place(c: Candidate, state: State, stats: dict) -> None:
 def run(cfg: Config, state: State) -> dict:
     stats = {"batches": 0, "feed_items": 0, "candidates": 0, "auto_merged": 0, "failed": 0,
              "skipped": 0, "dropped": 0}
+    usage: dict = {}
     if shutil.which(cfg.extract.claude_bin) is None:
         stats["error"] = f"{cfg.extract.claude_bin} not on PATH"
         log.warning("extract: %s", stats["error"])
@@ -228,9 +254,9 @@ def run(cfg: Config, state: State) -> dict:
         ids = [int(r["id"]) for r in rows]
         batch_id = uuid.uuid4().hex[:8]
         user_msg = build_user_message(rows, cfg)
-        payload = call_claude(cfg, sys_prompt, user_msg)
+        payload = call_claude(cfg, sys_prompt, user_msg, usage=usage)
         if payload is None:
-            payload = call_claude(cfg, sys_prompt, user_msg)  # one retry
+            payload = call_claude(cfg, sys_prompt, user_msg, usage=usage)  # one retry
         if payload is None:
             if stats["batches"] == 0:
                 # Nothing has worked this run → almost certainly the CLI itself (auth, quota,
@@ -250,5 +276,11 @@ def run(cfg: Config, state: State) -> dict:
         if time.monotonic() > deadline:
             stats["note"] = "time box reached"
             break
+    if usage:
+        stats["usage"] = usage
+        lifetime = state.meta_json("extract:lifetime", {}) or {}
+        _add_usage(lifetime, usage)
+        lifetime["runs"] = lifetime.get("runs", 0) + 1
+        state.meta_set("extract:lifetime", json.dumps(lifetime))
     log.info("extract: %s", stats)
     return stats
