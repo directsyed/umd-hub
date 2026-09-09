@@ -88,10 +88,9 @@ items:
      weight: "low-stakes (partial credit if any sub-task missed)", notes: "Post early so there are peers to respond to. 3 is the floor."}
   - {course: ENGL390, kind: expected, title: "Reflective essay 1 (beginning of semester)", notes: "Date on Canvas."}
   # Résumé / cover letter / CV / personal statement / job description placeholders removed 2026-09-09:
-  # Canvas now supplies the real dated assignments ("Resume, Cover Letter, Personal Statement Draft" etc.).
-  - {course: ENGL390, kind: expected, title: "Audience analysis + topic selection/dissemination", notes: "Date on Canvas."}
+  # Canvas now supplies the real dated assignments ("Resume, Cover Letter, Personal Statement Draft",
+  # "Audience Analysis Draft/Final", "Building the Review Paper", "Literature Review Article", …).
   - {course: ENGL390, kind: expected, title: "Reflective essay 2 (mid-semester)", notes: "Date on Canvas."}
-  - {course: ENGL390, kind: expected, title: "Review paper (draft → final)", notes: "Book the protected 1:1 conference. Late drafts are NOT accepted."}
   - {course: ENGL390, kind: expected, title: "Grant proposal (draft → final)", notes: "Book the protected 1:1 conference. Late drafts are NOT accepted."}
 
 recurring:

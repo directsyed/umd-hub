@@ -101,7 +101,7 @@ _PROJECT_RE = re.compile(r"\bproj(ect)?s?\b", re.I)
 _ASSIGN_RE = re.compile(
     r"\b(homework|hw|assignment|problem\s*set|pset|lab|matlab|discussion|essay|draft|paper|proposal|"
     r"reflection|reflective|worksheet|exercise|memo|statement|resume|résumé|letter|vitae|cv|report|"
-    r"post|response|analysis|submission)\b", re.I)
+    r"post|response|analysis|submission|article|review|literature|bibliography|annotated|outline)\b", re.I)
 
 
 def classify_kind(title: str, default: str = "assignment") -> str:

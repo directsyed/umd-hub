@@ -18,6 +18,7 @@ def test_helpers(cfg):
     assert classify_kind("Homework 0") == "assignment"
     assert classify_kind("Final Resume, Cover Letter, Personal Statement") == "assignment"
     assert classify_kind("Final Topic Selection Memo") == "assignment"
+    assert classify_kind("Final Literature Review Article") == "assignment"
     assert classify_kind("Final", "event") == "exam"
     assert classify_kind("Fall Break", "event") == "event"
     assert guess_course("[CMSC330] Project 1 released", cfg.courses) == "CMSC330"
