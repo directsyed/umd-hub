@@ -202,6 +202,17 @@ def merge_fields(existing: dict, obs: dict, obs_source: str) -> dict:
         if not existing.get(f) and obs.get(f):
             up[f] = obs[f]
 
+    # The seed file is human-maintained: an edit there (rename, new note, corrected kind) must
+    # propagate to a row the seed still owns. Live sources keep precedence otherwise.
+    if obs_source == "seed" and cur_src == "seed":
+        for f in ("title", "weight_note", "notes", "kind"):
+            v = obs.get(f)
+            if v and v != existing.get(f):
+                up[f] = v
+        if "title" in up:
+            up["title_norm"] = obs.get("title_norm") or normalize_title(up["title"])
+        return up
+
     # title: highest-priority source names it; remember the seed's wording.
     obs_title = obs.get("title")
     if obs_title and obs_pri >= cur_pri and obs_title != existing.get("title"):

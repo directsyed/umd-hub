@@ -91,6 +91,15 @@ def test_expected_placeholder_upgrades_kind():
     assert up["kind"] == "quiz"
 
 
+def test_seed_rename_propagates_to_seed_owned_row():
+    ex = {**_seed_existing(), "title": "Matlab 1", "title_norm": "matlab 1", "notes": "old"}
+    up = merge.merge_fields(ex, {"title": "Matlab Project 1", "title_norm": "matlab project 1",
+                                 "kind": "quiz", "weight_note": "2%", "notes": "new note"}, "seed")
+    assert up["title"] == "Matlab Project 1" and up["title_norm"] == "matlab project 1"
+    assert up["notes"] == "new note" and "weight_note" not in up
+    assert "status" not in up and "primary_source" not in up
+
+
 def test_seed_does_not_override_live_dates():
     ex = {**_seed_existing(), "primary_source": "gradescope", "weight_note": None}
     obs = {"due_at": "2026-09-30T03:59:59+00:00", "due_date_local": "2026-09-29", "all_day": 1,
