@@ -72,6 +72,10 @@ class ExtractCfg(BaseModel):
     enabled: bool = True
     claude_bin: str = "claude"
     model: str = "haiku"
+    # low | medium | high — measured 2026-09-09 on a 5-post Piazza batch: default ≈ 12.2k output
+    # tokens / 121 s, low ≈ 9.2k / 84 s, medium ≈ 8.8k / 90 s. Thinking fully off breaks the
+    # structured-output schema, so "low" is the floor. Empty string = CLI default.
+    effort: str = "low"
     batch_size: int = 5
     max_batch_chars: int = 9000
     max_body_chars: int = 2000

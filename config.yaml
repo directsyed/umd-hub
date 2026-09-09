@@ -109,6 +109,7 @@ extract:
   enabled: true
   claude_bin: "claude"
   model: "haiku"
+  effort: "low"          # low|medium|high; measured: low ≈ 25% fewer output tokens, 30% faster, same results
   batch_size: 5
   max_batch_chars: 9000
   max_body_chars: 2000
