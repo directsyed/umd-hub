@@ -275,7 +275,7 @@ def _register(app: FastAPI) -> None:
         undated = [r for r in open_rows if not r["due_date_local"]]
         past = [r for r in dated if r["due_date_local"] < today.isoformat()]
         upcoming = [r for r in dated if r["due_date_local"] >= today.isoformat()]
-        archive = st.items_for_course(code, ("done", "cancelled"))
+        archive = st.items_for_course(code, ("done", "missed", "cancelled"))
         return templates.TemplateResponse(request, "course.html.j2", _ctx(
             request, st, code=code, course=cfg.courses[code], upcoming=upcoming, past=past, undated=undated,
             archive=archive, feed=st.feed(course=code, limit=30), grades=st.grades_for_course(code)))
@@ -291,6 +291,8 @@ def _register(app: FastAPI) -> None:
             st.set_status(item_id, "done")
         elif action in ("undone", "reopen"):
             st.set_status(item_id, "open")
+        elif action == "missed":
+            st.set_status(item_id, "missed")
         elif action == "cancel":
             st.set_status(item_id, "cancelled")
         elif action == "snooze":

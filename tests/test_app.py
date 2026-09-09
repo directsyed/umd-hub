@@ -42,6 +42,22 @@ def test_today_lists_seed_items_and_actions(seeded, client):
     assert r.json()["status"] == "open"
 
 
+def test_missed_status_leaves_overdue_but_stays_in_archive(seeded, client):
+    from umdhub.core import timeutil as tu
+    _login(client)
+    past, all_day = tu.from_local("2026-09-01", None)
+    iid = seeded.add_manual_item("CMSC351", "quiz", "Quiz 3 (NP Intro)", past, all_day)
+    assert any(r["id"] == iid for r in seeded.overdue(tu.utcnow_iso(), "2026-09-09"))
+    today_html = client.get("/").text
+    assert 'data-act="missed"' in today_html                # button renders on overdue rows…
+    assert today_html.count('data-act="missed"') < today_html.count('data-act="done"')  # …but not on future ones
+    r = client.post(f"/item/{iid}/missed", headers={"X-Requested-With": "fetch"})
+    assert r.json()["status"] == "missed"
+    assert not any(r["id"] == iid for r in seeded.overdue(tu.utcnow_iso(), "2026-09-09"))
+    html = client.get("/course/CMSC351").text
+    assert "Quiz 3 (NP Intro)" in html and 'class="tag bad">missed' in html
+
+
 def test_post_with_foreign_origin_rejected(seeded, client):
     _login(client)
     row = seeded.items_between("2026-09-11", "2026-09-11")[0]

@@ -1,25 +1,27 @@
-{% macro item_row(it, show_course=True, show_date=False) -%}
+{% macro item_row(it, show_course=True, show_date=False, overdue=False) -%}
 <li class="item kind-{{ it.kind }} status-{{ it.status }}" data-id="{{ it.id }}">
   <div class="row">
     <span class="icon" title="{{ it.kind }}">{{ KIND_ICON.get(it.kind, '•') }}</span>
     {% if show_course %}<a class="pill sm" style="--c: {{ courses[it.course].color }}" href="/course/{{ it.course }}">{{ it.course }}</a>{% endif %}
     <span class="title">{% if it.url %}<a href="{{ it.url }}" target="_blank" rel="noopener">{{ it.title }}</a>{% else %}{{ it.title }}{% endif %}</span>
+    {% if it.status == 'missed' %}<span class="tag bad">missed</span>{% elif it.status == 'cancelled' %}<span class="tag">n/a</span>{% elif it.status == 'done' %}<span class="tag good">done</span>{% endif %}
     <span class="when">{% if it.due_at %}{% if show_date %}{{ it.due_at|et(it.all_day) }}{% else %}{{ it.due_at|et_time(it.all_day) }}{% endif %}{% else %}—{% endif %}</span>
   </div>
   {% if it.weight_note or it.notes or it.submission_status or it.score %}
   <div class="meta">
     {% if it.weight_note %}<span class="weight">{{ it.weight_note }}</span>{% endif %}
-    {% if it.submission_status %}<span class="sub">{{ it.submission_status }}</span>{% endif %}
+    {% if it.submission_status %}<span class="sub {% if 'no ' in it.submission_status|lower or 'missing' in it.submission_status|lower %}bad{% endif %}">{{ it.submission_status }}</span>{% endif %}
     {% if it.score %}<span class="score">{{ it.score }}</span>{% endif %}
     {% if it.notes %}<details class="notes"><summary>notes</summary><div>{{ it.notes }}</div></details>{% endif %}
   </div>
   {% endif %}
   <div class="actions">
     {% if it.status in ('open', 'snoozed') %}
-      <button data-act="done">✓ done</button>
-      <button data-act="snooze" data-until="tomorrow">zz→tmrw</button>
-      <button data-act="snooze" data-until="3d">zz→3d</button>
-      <button data-act="cancel" class="quiet">✕</button>
+      <button data-act="done" title="Submitted / finished">✓ done</button>
+      {% if overdue %}<button data-act="missed" class="danger" title="Was due, never submitted, now closed">✗ missed</button>{% endif %}
+      <button data-act="snooze" data-until="tomorrow" title="Hide until tomorrow 8 am">snooze</button>
+      {% if not overdue %}<button data-act="snooze" data-until="3d" title="Hide for 3 days">3 d</button>{% endif %}
+      <button data-act="cancel" class="quiet" title="Cancelled / doesn't apply to me">n/a</button>
     {% else %}
       <button data-act="reopen" class="quiet">reopen</button>
     {% endif %}

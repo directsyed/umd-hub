@@ -6,7 +6,9 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 
 KINDS = ("assignment", "quiz", "exam", "project", "event", "admin", "expected")
-STATUSES = ("open", "done", "snoozed", "cancelled")
+# open → still to do · done → submitted · snoozed → hidden until a date · missed → was real, was due,
+# never submitted and now closed · cancelled → doesn't apply (dropped by the professor, not mine)
+STATUSES = ("open", "done", "snoozed", "missed", "cancelled")
 KIND_ICON = {
     "assignment": "📝", "quiz": "❓", "exam": "🎓", "project": "🛠️",
     "event": "📅", "admin": "⚠️", "expected": "◌",

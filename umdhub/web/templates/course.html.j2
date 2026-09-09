@@ -7,7 +7,7 @@
 {% if past %}
 <section class="overdue">
   <h2>Past due / not marked done <span class="count">{{ past|length }}</span></h2>
-  <ul class="items">{% for it in past %}{{ item_row(it, show_course=False, show_date=True) }}{% endfor %}</ul>
+  <ul class="items">{% for it in past %}{{ item_row(it, show_course=False, show_date=True, overdue=True) }}{% endfor %}</ul>
 </section>
 {% endif %}
 
@@ -52,7 +52,7 @@
 
 <section>
   <details>
-    <summary><h2>Done / cancelled <span class="count">{{ archive|length }}</span></h2></summary>
+    <summary><h2>Done / missed / n-a <span class="count">{{ archive|length }}</span></h2></summary>
     <ul class="items">{% for it in archive %}{{ item_row(it, show_course=False, show_date=True) }}{% endfor %}</ul>
   </details>
 </section>

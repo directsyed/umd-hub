@@ -5,7 +5,7 @@
 {% if overdue %}
 <section class="overdue">
   <h2>Overdue <span class="count">{{ overdue|length }}</span></h2>
-  <ul class="items">{% for it in overdue %}{{ item_row(it, show_date=True) }}{% endfor %}</ul>
+  <ul class="items">{% for it in overdue %}{{ item_row(it, show_date=True, overdue=True) }}{% endfor %}</ul>
 </section>
 {% endif %}
 
