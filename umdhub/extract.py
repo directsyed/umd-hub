@@ -94,6 +94,8 @@ def call_claude(cfg: Config, sys_prompt: str, user_msg: str, *, timeout: int | N
         "--permission-mode", "dontAsk",
         "--max-budget-usd", str(cfg.extract.budget_usd),
     ]
+    if cfg.extract.effort:
+        cmd += ["--effort", cfg.extract.effort]
     # Drop nested-session variables (when run from inside an interactive Claude Code session) but
     # keep the long-lived token that headless runs authenticate with (`claude setup-token`).
     env = {k: v for k, v in os.environ.items()
