@@ -199,7 +199,9 @@ def _place(c: Candidate, state: State, stats: dict) -> None:
     if best:
         c.matched_item_id = int(best["id"])
         same_day = obs["due_date_local"] and best.get("due_date_local") == obs["due_date_local"]
-        if c.action == "new" and same_day:
+        # A "new" or "move" that lands on the date the item already has changes nothing — record
+        # the provenance and skip the tray. Only real date changes and cancellations need a human.
+        if c.action in ("new", "move") and same_day:
             cid = state.add_candidate(c)
             if cid:
                 state.decide_candidate(cid, "auto_merged", c.matched_item_id)
