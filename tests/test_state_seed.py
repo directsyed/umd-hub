@@ -98,6 +98,23 @@ def test_merge_items_folds_duplicate(seeded):
     assert len(seeded.item_sources(int(keep["id"]))) == 2
 
 
+def test_cancelled_and_missed_items_still_absorb_live_observations(seeded):
+    due, _ = tu.from_local("2026-09-09", "10:00")
+    gs = Item(course="CMSC351", kind="quiz", title="Quiz 3 (NP Intro)", source="gradescope", source_id="gs:q3", due_at=due)
+    iid, was_new, _ = seeded.upsert_item(gs)
+    assert was_new
+    seeded.set_status(iid, "cancelled")
+    before = seeded.count_items()
+    # a second source sees the same quiz → must merge into the cancelled row, not create a twin
+    other = Item(course="CMSC351", kind="quiz", title="Quiz 3", source="course_site", source_id="cs:q3", due_at=due)
+    iid2, was_new2, _ = seeded.upsert_item(other)
+    assert iid2 == iid and not was_new2 and seeded.count_items() == before
+    assert seeded.item(iid)["status"] == "cancelled"        # merging never touches status
+    seeded.set_status(iid, "missed")
+    iid3, was_new3, _ = seeded.upsert_item(gs)
+    assert iid3 == iid and not was_new3 and seeded.item(iid)["status"] == "missed"
+
+
 def test_credentials_roundtrip(state):
     state.set_credential("gradescope", "cookie", "  signed_token=abc; _gradescope_session=def  ")
     assert state.creds_for("gradescope") == {"cookie": "signed_token=abc; _gradescope_session=def"}

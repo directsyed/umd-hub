@@ -368,6 +368,9 @@ def _register(app: FastAPI) -> None:
                 "INSERT OR IGNORE INTO item_source(item_id, source, source_id, first_seen, last_seen) "
                 "VALUES(?,?,?,?,?)", (c["matched_item_id"], "candidate", f"cand:{cid}", tu.utcnow_iso(), tu.utcnow_iso()))
         item_id, _, _ = st.upsert_item(it)
+        row = st.item(item_id)
+        if row and row["status"] == "cancelled":
+            st.set_status(item_id, "open")   # confirming a candidate means "this is real after all"
         st.decide_candidate(cid, "confirmed", item_id)
         return RedirectResponse("/candidates?msg=confirmed", status_code=303)
 

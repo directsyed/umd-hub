@@ -122,9 +122,10 @@ class State:
 
     # ------------------------------------------------------------------ items
     def _match_pool(self, course: str) -> list[dict]:
+        """Every item of the course, whatever its status: a source that still lists a cancelled or
+        missed item must merge into it, not create a twin. Status itself is never touched by merging."""
         rows = self.conn.execute(
-            "SELECT id, course, title_norm, due_date_local, kind, status FROM item "
-            "WHERE course=? AND status != 'cancelled'", (course,))
+            "SELECT id, course, title_norm, due_date_local, kind, status FROM item WHERE course=?", (course,))
         return [dict(r) for r in rows]
 
     def upsert_item(self, it: Item) -> tuple[int, bool, bool]:
