@@ -344,19 +344,29 @@ class State:
 
     # ------------------------------------------------------------------ feed
     def upsert_feed_item(self, f: FeedItem) -> tuple[int, bool]:
+        """Insert a message, or refresh one whose content changed (a Piazza post that got an
+        instructor answer, an edited announcement). A changed body re-queues extraction and
+        marks the item unread again — the new text is what carries deadline changes.
+        Returns (id, was_new)."""
         now = utcnow_iso()
         body = (f.body or "")[:20000]
-        cur = self.conn.execute(
-            "INSERT INTO feed_item(source, source_id, course, author, is_instructor, subject, body, url, "
-            "posted_at, fetched_at) VALUES(?,?,?,?,?,?,?,?,?,?) "
-            "ON CONFLICT(source, source_id) DO UPDATE SET course=COALESCE(feed_item.course, excluded.course), "
-            "body=CASE WHEN length(excluded.body) > length(feed_item.body) THEN excluded.body ELSE feed_item.body END",
-            (f.source, f.source_id, f.course, f.author, 1 if f.is_instructor else 0, f.subject[:500],
-             body, f.url, f.posted_at, now))
         row = self.conn.execute(
-            "SELECT id, fetched_at FROM feed_item WHERE source=? AND source_id=?",
+            "SELECT id, body, subject FROM feed_item WHERE source=? AND source_id=?",
             (f.source, f.source_id)).fetchone()
-        return int(row["id"]), row["fetched_at"] == now
+        if row is None:
+            cur = self.conn.execute(
+                "INSERT INTO feed_item(source, source_id, course, author, is_instructor, subject, body, url, "
+                "posted_at, fetched_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (f.source, f.source_id, f.course, f.author, 1 if f.is_instructor else 0, f.subject[:500],
+                 body, f.url, f.posted_at, now))
+            return int(cur.lastrowid), True
+        if body != (row["body"] or "") or f.subject[:500] != row["subject"]:
+            self.conn.execute(
+                "UPDATE feed_item SET body=?, subject=?, author=COALESCE(?, author), "
+                "is_instructor=MAX(is_instructor, ?), course=COALESCE(course, ?), url=COALESCE(?, url), "
+                "fetched_at=?, extract_status='pending', extracted_at=NULL, read_at=NULL WHERE id=?",
+                (body, f.subject[:500], f.author, 1 if f.is_instructor else 0, f.course, f.url, now, row["id"]))
+        return int(row["id"]), False
 
     def feed(self, *, unread_only: bool = False, source: str | None = None, course: str | None = None,
              limit: int = 100) -> list[sqlite3.Row]:

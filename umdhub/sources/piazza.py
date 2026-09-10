@@ -11,12 +11,10 @@ import json
 import logging
 import time
 
-from bs4 import BeautifulSoup
-
 from ..core.config import env
 from ..core.models import FeedItem
 from ..core.timeutil import parse_iso, to_utc_iso
-from .base import AuthError, SourceResult, guess_course, parse_cookie_header
+from .base import AuthError, SourceResult, guess_course, html_to_text, parse_cookie_header
 
 log = logging.getLogger(__name__)
 _INSTRUCTOR_ROLES = {"instructor", "professor", "ta"}
@@ -75,10 +73,56 @@ def _classes(p, cfg, term: str) -> list[tuple[str, str, dict]]:
 
 
 def _html_to_text(html: str | None) -> str:
-    if not html:
-        return ""
-    soup = BeautifulSoup(html, "lxml")
-    return soup.get_text("\n").strip()
+    return html_to_text(html)
+
+
+def _latest(node: dict) -> tuple[str, str | None, str]:
+    """(text, created, uid) from a node carrying a versioned history[] (post, i_answer, s_answer)."""
+    hist = node.get("history") or []
+    h = hist[0] if hist else {}
+    return _html_to_text(h.get("content")), h.get("created"), str(h.get("uid") or "")
+
+
+def render_post(full: dict, feed_entry: dict, instructors: set[str]) -> tuple[str, str, bool, str | None]:
+    """Flatten a Piazza thread into (subject, body, any_instructor, created).
+
+    The question/note is history[0]; answers live in children[] as type i_answer / s_answer
+    (versioned, text in history), and discussion lives in children[] as type followup with
+    nested feedback replies (text in `subject`). Staff answer *inside* the student's post, so a
+    body built from history[0] alone drops exactly the part that carries deadline changes.
+    """
+    hist = (full.get("history") or [{}])
+    head = hist[0] if hist else {}
+    subject = (head.get("subject") or feed_entry.get("subject") or "(no subject)").strip()
+    text, created, uid = _latest(full)
+    tags = set(full.get("tags") or feed_entry.get("tags") or [])
+    any_instr = "instructor-note" in tags or (uid in instructors)
+    parts = [text or _html_to_text(feed_entry.get("content_snipet")) or ""]
+    for child in full.get("children") or []:
+        ctype = child.get("type")
+        if ctype in ("i_answer", "s_answer"):
+            t, _, u = _latest(child)
+            if not t.strip():
+                continue
+            if ctype == "i_answer" or u in instructors:
+                any_instr = True
+            parts.append(f"--- {'Instructor' if ctype == 'i_answer' else 'Student'} answer ---\n{t}")
+        elif ctype == "followup":
+            t = _html_to_text(child.get("subject"))
+            u = str(child.get("uid") or "")
+            who = "instructor" if u in instructors else "student"
+            any_instr = any_instr or who == "instructor"
+            if t.strip():
+                parts.append(f"--- Follow-up ({who}) ---\n{t}")
+            for fb in child.get("children") or []:
+                t2 = _html_to_text(fb.get("subject"))
+                u2 = str(fb.get("uid") or "")
+                who2 = "instructor" if u2 in instructors else "student"
+                any_instr = any_instr or who2 == "instructor"
+                if t2.strip():
+                    parts.append(f"--- Reply ({who2}) ---\n{t2}")
+    body = "\n\n".join(p for p in parts if p and p.strip())
+    return subject, body, any_instr, created
 
 
 def _iso(s) -> str | None:
@@ -114,18 +158,13 @@ def fetch(cfg, src_cfg, creds, state, http) -> SourceResult:
                 if not cid or (modified and modified <= last_ts):
                     continue
                 full = net.get_post(cid) or {}
-                hist = (full.get("history") or [{}])[0]
-                subject = (hist.get("subject") or post.get("subject") or "(no subject)").strip()
-                body = _html_to_text(hist.get("content")) or post.get("content_snipet") or ""
-                tags = set(full.get("tags") or post.get("tags") or [])
-                uid = str(hist.get("uid") or "")
-                is_instr = "instructor-note" in tags or uid in instructors
+                subject, body, is_instr, created = render_post(full, post, instructors)
                 nr = full.get("nr") or post.get("nr")
                 url = f"https://piazza.com/class/{nid}/post/{nr}" if nr else f"https://piazza.com/class/{nid}"
                 res.feed_items.append(FeedItem(
                     source="piazza", source_id=f"{nid}:{cid}", course=code, subject=subject, body=body,
                     author=("instructor" if is_instr else "student"), is_instructor=is_instr, url=url,
-                    posted_at=_iso(hist.get("created") or full.get("created"))))
+                    posted_at=_iso(created or full.get("created"))))
                 n_new += 1
                 if modified > newest:
                     newest = modified

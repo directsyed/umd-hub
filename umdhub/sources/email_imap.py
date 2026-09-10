@@ -15,12 +15,10 @@ import re
 from email import policy
 from email.utils import parseaddr, parsedate_to_datetime
 
-from bs4 import BeautifulSoup
-
 from ..core.config import env
 from ..core.models import FeedItem
 from ..core.timeutil import to_utc_iso
-from .base import AuthError, SourceResult, guess_course
+from .base import AuthError, SourceResult, guess_course, html_to_text
 
 log = logging.getLogger(__name__)
 imaplib._MAXLINE = 20_000_000  # large mailboxes overflow the stdlib default
@@ -68,10 +66,7 @@ def _body_text(msg) -> str:
     except Exception:  # noqa: BLE001
         return ""
     if part.get_content_type() == "text/html":
-        soup = BeautifulSoup(content, "lxml")
-        for t in soup(["script", "style"]):
-            t.decompose()
-        content = soup.get_text("\n")
+        content = html_to_text(content)
     lines = [ln.rstrip() for ln in content.splitlines()]
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
 

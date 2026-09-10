@@ -90,6 +90,28 @@ def parse_cookie_header(s: str | None) -> dict[str, str]:
     return {k: v.strip() for k, v in _COOKIE_PAIR.findall(s) if k}
 
 
+_BLOCK_TAGS = ["p", "div", "li", "tr", "h1", "h2", "h3", "h4", "h5", "pre", "blockquote", "ul", "ol", "table", "hr"]
+
+
+def html_to_text(html: str | None) -> str:
+    """HTML → readable text: block elements become line breaks, inline ones (<b>, <a>, <code>)
+    stay inside their sentence. `get_text("\\n")` would split "When is <b>Project 0</b> due?"
+    across three lines and wreck the sentence the extractor is asked to quote."""
+    if not html:
+        return ""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+    for t in soup(["script", "style"]):
+        t.decompose()
+    for br in soup.find_all("br"):
+        br.replace_with("\n")
+    for tag in soup.find_all(_BLOCK_TAGS):
+        tag.insert_before("\n")
+        tag.insert_after("\n")
+    lines = [re.sub(r"[ \t\xa0]+", " ", ln).strip() for ln in soup.get_text("").splitlines()]
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:80]
 
