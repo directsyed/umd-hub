@@ -90,6 +90,7 @@ sources:
   piazza:
     enabled: true
     max_posts_per_class: 30
+    recheck_days: 7      # re-read every post created within this window each run (catches replies that bump no stamp)
   course_site:
     enabled: true
     sites:

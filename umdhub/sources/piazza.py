@@ -130,6 +130,26 @@ def _iso(s) -> str | None:
     return to_utc_iso(dt) if dt else None
 
 
+def activity_stamp(entry: dict) -> str:
+    """Last activity on a feed entry: the max of `modified` and every event time in its `log`
+    (create / followup / i_answer / s_answer / update). Verified 2026-09-10: `modified` follows
+    the log's last event; `updated` is just the creation time; feedback replies inside a followup
+    appear in neither — hence the recheck window in fetch()."""
+    stamps = [str(entry.get("modified") or "")]
+    stamps += [str(ev.get("t") or "") for ev in (entry.get("log") or []) if isinstance(ev, dict)]
+    return max(s for s in stamps if s) if any(stamps) else ""
+
+
+def created_stamp(entry: dict) -> str:
+    """Creation time of a feed entry: the earliest log event, else `updated` (Piazza sets it to
+    the creation time), else `created`."""
+    times = [str(ev.get("t") or "") for ev in (entry.get("log") or []) if isinstance(ev, dict)]
+    times = [t for t in times if t]
+    if times:
+        return min(times)
+    return str(entry.get("updated") or entry.get("created") or "")
+
+
 def fetch(cfg, src_cfg, creds, state, http) -> SourceResult:
     p = _client(creds, state)
     res = SourceResult(auth_ok=True)
@@ -152,10 +172,19 @@ def fetch(cfg, src_cfg, creds, state, http) -> SourceResult:
             feed = net.get_feed(limit=max_posts, offset=0) or {}
             newest = last_ts
             n_new = 0
+            recheck_days = int(src_cfg.get("recheck_days", 7))
+            from datetime import timedelta
+            from ..core.timeutil import utcnow
+            recheck_cutoff = (utcnow() - timedelta(days=recheck_days)).strftime("%Y-%m-%dT%H:%M:%SZ")
             for post in feed.get("feed", []):
                 cid = post.get("id")
-                modified = str(post.get("modified") or post.get("updated") or "")
-                if not cid or (modified and modified <= last_ts):
+                if not cid:
+                    continue
+                modified = activity_stamp(post)
+                recent = created_stamp(post) >= recheck_cutoff
+                # Skip only when nothing in the log moved AND the post is old enough that a silent
+                # reply-to-a-followup (which bumps no stamp) is unlikely to matter.
+                if modified and modified <= last_ts and not recent:
                     continue
                 full = net.get_post(cid) or {}
                 subject, body, is_instr, created = render_post(full, post, instructors)

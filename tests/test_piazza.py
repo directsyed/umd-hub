@@ -1,5 +1,19 @@
 from umdhub.core.models import FeedItem
-from umdhub.sources.piazza import render_post
+from umdhub.sources.piazza import activity_stamp, created_stamp, render_post
+
+
+def test_activity_and_created_stamps_follow_the_log():
+    # real shape from post #21 (2026-09-10): create → followup → update; `updated` is the creation time
+    e = {"modified": "2026-09-05T03:19:57Z", "updated": "2026-09-04T17:17:06Z",
+         "log": [{"t": "2026-09-04T17:17:06Z", "n": "create"}, {"t": "2026-09-04T20:19:30Z", "n": "followup"},
+                 {"t": "2026-09-05T03:19:57Z", "n": "update"}]}
+    assert activity_stamp(e) == "2026-09-05T03:19:57Z"
+    assert created_stamp(e) == "2026-09-04T17:17:06Z"
+    # an answer logged after `modified` still counts as activity
+    e2 = {"modified": "2026-09-08T23:30:40Z",
+          "log": [{"t": "2026-09-08T23:30:40Z", "n": "create"}, {"t": "2026-09-08T23:34:00Z", "n": "i_answer"}]}
+    assert activity_stamp(e2) == "2026-09-08T23:34:00Z"
+    assert activity_stamp({}) == "" and created_stamp({"updated": "x"}) == "x"
 
 INSTRUCTORS = {"u-cliff", "u-ta1"}
 
